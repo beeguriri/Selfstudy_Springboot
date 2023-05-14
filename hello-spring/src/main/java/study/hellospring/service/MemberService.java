@@ -2,7 +2,6 @@ package study.hellospring.service;
 
 import study.hellospring.domain.Member;
 import study.hellospring.repository.MemberRepository;
-import study.hellospring.repository.MemoryMemberRepository;
 
 import java.util.List;
 import java.util.Optional;
