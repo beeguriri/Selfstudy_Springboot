@@ -3,6 +3,7 @@ package study.hellospring;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import study.hellospring.aop.TimeTraceAop;
 import study.hellospring.repository.*;
 import study.hellospring.service.MemberService;
 
@@ -46,5 +47,11 @@ public class SpringConfig {
 //        return new JdbcMemberRepository(dataSource);
 //        return new JdbcTempleteMemberRepository(dataSource);
 //        return  new JpaMemberRepository(em);
+//    }
+
+//    @Bean
+//    public TimeTraceAop timeTraceAop() {
+//
+//        return new TimeTraceAop();
 //    }
 }

@@ -23,9 +23,18 @@ public class MemberService {
     // 회원가입
     public Long join(Member member){
 
-        validateDuplicateMember(member); //중복회원 검증
-        memberRepository.save(member);
-        return member.getId();
+        long start = System.currentTimeMillis();
+
+        try {
+            validateDuplicateMember(member); //중복회원 검증
+            memberRepository.save(member);
+            return member.getId();
+        } finally {
+            long finish = System.currentTimeMillis();
+            long timeMs = finish - start;
+//            System.out.println("join = " + timeMs + "ms");
+        }
+
     }
 
     // optional 일때 쓸 수 있는 ifPresent
