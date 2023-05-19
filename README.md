@@ -1,5 +1,6 @@
 # Selfstudy_Springboot
-Springboot 처음부터 다시 차근차근 공부하기!
+- Springboot 처음부터 다시 차근차근 공부하기!
+- 강의명 : 우아한형제들 최연소 기술이사 김영한의 스프링 완전 정복
 
 #### [`1. hello-spring`](https://github.com/beeguriri/Selfstudy_Springboot/tree/main/hello-spring)
 - 스프링 입문 - 코드로 배우는 스프링 부트, 웹 MVC, DB 접근 기술
