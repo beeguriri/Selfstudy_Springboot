@@ -2,11 +2,11 @@ package study.core.member;
 
 public class MemberServiceImpl implements MemberService{
 
-    // MemberServiceImpl 은
-    // MemberRepository에도 의존하고 (추상화에 의존)
-    // MemoryMemberRepository에도 의존 함 (구체화에 의존)
-    // DIP 위반
-    private final MemberRepository memberRepository = new MemoryMemberRepository();
+    private final MemberRepository memberRepository;
+
+    public MemberServiceImpl(MemberRepository memberRepository) {
+        this.memberRepository = memberRepository;
+    }
 
     @Override
     public void join(Member member) {
