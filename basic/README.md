@@ -81,3 +81,73 @@ public OrderServiceImpl(MemberRepository memberRepository, DiscountPolicy discou
   - `EnvironmentCapable` 환경변수
   - `ApllicationEventPublisher` 애플리케이션 이벤트
   - `ResourceLoader` 편리한 리소스 조회
+
+## 싱글톤 컨테이너
+### 싱글톤 패턴
+- 메모리 낭비를 줄이기 위하여 해당 객체는 1개만 생성되고 공유하도록 설계 한다
+- 객체 인스턴스를 2개 이상 생성하지 못하도록
+  - private 생성자를 사용해서 외부에서 임의로 `new` 키워드를 사용하지 못하도록 막아야 한다.
+```java
+// static 영역에 객체를 딱 1개만 생성
+private static final SingletoneService instance = new SingletoneService();
+
+// public으로 열어서 객체 인스턴스가 필요하면 이 static 메서드를 통해서만 조회하도록 함
+public static SingletoneService getInstance() {
+    return instance;
+}
+
+// 생성자를 private로 만들어 외부에서 new 키워드를 사용한 객체 생성을 못하게 막음
+private SingletoneService() {
+}
+```
+- 싱글톤 패턴의 문제점
+  - 코드 자체가 많이 들어감 
+  - 클라이언트가 구체 클래스에 의존한다 -> DIP위반
+  - private 생성자로 자식 클래스 만들기 어려움
+  - 결론적으로 유연성이 떨어진다
+
+### 싱글톤 컨테이너
+- 싱글톤 패턴의 문제점을 해결하면서, 객체 인스턴스를 싱글톤으로 관리
+- 스프링 컨테이너가 빈 객체를 미리 생성해놓고 관리함
+
+### 싱글톤 방식의 주의점
+- 여러 클라이언트가 하나의 같은 객체 인스턴스를 공유하기 때문에 상태를 유지(stateful)하게 설계하면 안됨
+- 가급적 읽기만 가능해야함
+- 스프링빈은 항상 무상태로 설계되어야 함
+  - 필드 대신 자바에서 공유되지 않는 지역변수, 파라미터, ThreadLocal 등을 사용
+```java
+// 기존
+public class StatefulService {
+
+    private int price; // 상태를 유지하는 필드
+
+    public void order(String name, int price) {
+        this.price = price; // 여기가 문제!
+    }
+    
+    public int getPrice() {
+        return price;
+    }
+```
+```java
+// 변경
+public class StatefulService {
+    public int order(String name, int price) {
+        return price;
+    }
+```
+
+### `@Configuration`
+- 스프링 컨테이너가 빈을 등록하고 관리
+- Configuration <- AppConfig@CGLIB
+- 빈이 등록되어 있으면 등록된 빈 반환, 아니면 새로운 빈 등록하고 반환
+- 인스턴스 1개만 만들고 공유해서 사용하므로 싱글톤 보장
+```text
+AppConfig 호출 시 `MemoryMemberRepository` 세번 호출 할 것 같지만
+@Bean MemberService -> new MemoryMemberRepository();
+@Bean MemberRepository -> new MemoryMemberRepository();
+@Bean OrderService -> new MemoryMemberRepository();
+
+실제로는 한번만 호출하고 등록 된 빈 가져다 씀!
+```
+
