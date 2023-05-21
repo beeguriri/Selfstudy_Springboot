@@ -7,7 +7,9 @@
   - Gradle Groovy `7.6.1`
   - java `17`
   - Dependencies
-    - ...
+    - `lombok`
+      - `File>Settings>Plugins`에서 `lombok` 설치
+      - `File>Settings>Build, Execution, Deployment>Compiler>Annotation Processors`에서 `Enable` 체크
 - IDE : IntelliJ
   - Settings > Build,Execution,Deployment > Build Tools > Gradle > Build and Run => `IntelliJ IDEA`
 - DB : ...
@@ -158,3 +160,45 @@ orderService -> memberRepository2 = study.core.member.MemoryMemberRepository@7fc
 memberRepository = study.core.member.MemoryMemberRepository@7fcf2fc1
 ```
 
+## 컴포넌트 스캔
+### 컴포넌트 스캔과 의존관계 자동 주입
+- `@ComponentScan`은 `@component`가 붙은 모든 클래스를 스프링 빈으로 자동 등록 함
+  - 스프링 빈의 기본 이름은 클래스명을 사용하되 맨 앞글자만 소문자를 사용
+  - 기존에 `@Bean`으로 등록했던 것을 해당 클래스에서 `@component`등록해줌
+- 기존에 `AppConfig`에서 의존관계 주입해 주었던 것을 해당 클래스에서 `@Autowired`로 자동 등록해줌
+- `@ComponentScan` 대상
+  - `@Component` : 컴포넌트 스캔에서 사용
+  - `@Controlller` : 스프링 MVC 컨트롤러에서 사용
+  - `@Service` : 스프링 비즈니스 로직에서 사용, 비즈니스 계측 인식에 도움 (특별한 처리는 하지 않음)
+  - `@Repository` : 스프링 데이터 접근 계층에서 사용, **데이터 계층의 예외를 스프링 예외로 변환**
+  - `@Configuration` : 스프링 설정 정보에서 사용, 스프링 빈이 싱글톤을 유지하도록 추가 처리
+
+### 의존관계 주입
+- **💜 생성자 주입 💜**
+  - 생성자 호출 시점에 딱 1번만 호출되는 것이 보장된다.
+  - `불변, 필수` 의존관계에 사용
+  - 생성자가 1개만 있으면 `@Autowired` 생략 가능 (스프링 컨테이너에 자동으로 등록됨)
+  - 필드에 `final` 키워드 사용할 수 있음 
+    - 생성자에서 혹시라도 값이 설정되지 않는 오류를 컴파일 단계에서 잡을 수 있음!
+  - 최근에는 `lombok`의 `@RequiredArgsConstructor`를 이용하여 간결하게 만듦
+    - `@RequiredArgsConstructor` : final이 붙은 필드로 생성자를 자동으로 만들어줌
+- 수정자 주입(Setter 주입)
+  - `선택, 변경` 가능성 있는 의존관계에 사용
+- ~~필드 주입~~
+  - 외부에서 변경이 불가능
+  - 수정하려면 결국 setter가 필요함
+  - 사용하지 말자! (테스트에서나 사용하자)
+
+### 조회 빈이 2개 이상일 때
+- `DiscountPolicy` 의 하위 타입인 `FixDiscountPolicy`, `RateDiscountPolicy` 둘다 스프링 빈으로 선언하면
+- `UnsatisfiedDependencyException` 오류 발생
+- 이때 하위 타입으로 지정하면 오류는 해결할 수 있지만 DIP를 위배하고 유연성이 떨어짐
+- 해결1: `@Autowired 필드 명 매칭`
+  - autowired는 기본적으로 타입으로 매칭함.
+  - 여러 빈이 있으면 필드 이름, 파라미터 이름으로 빈을 추가 매칭
+- 해결2: `@Qualifier`
+  - 추가구분자
+  - `@Qualifier("이름")` 의 이름 끼리 매칭
+- 해결3: `@Primary`
+  - 우선순위를 지정
+  - 여러개의 빈이 있으면 `@Primary`가 붙은 빈을 매칭함

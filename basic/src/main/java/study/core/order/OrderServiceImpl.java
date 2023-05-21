@@ -1,5 +1,10 @@
 package study.core.order;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
+import study.core.annotation.MainDiscountPolicy;
 import study.core.discount.DiscountPolicy;
 import study.core.discount.FixDiscountPolicy;
 import study.core.discount.RateDiscountPolicy;
@@ -7,12 +12,27 @@ import study.core.member.Member;
 import study.core.member.MemberRepository;
 import study.core.member.MemoryMemberRepository;
 
+@Component
+//@RequiredArgsConstructor //final이 붙은 필드로 생성자를 만들어줌
 public class OrderServiceImpl implements OrderService {
 
     private final MemberRepository memberRepository;
     private final DiscountPolicy discountPolicy;
 
-    public OrderServiceImpl(MemberRepository memberRepository, DiscountPolicy discountPolicy) {
+//    @Autowired //세터주입 테스트
+//    public void setMemberRepository(MemberRepository memberRepository) {
+//        this.memberRepository = memberRepository;
+//    }
+//
+//    @Autowired //세터주입 테스트
+//    public void setDiscountPolicy(DiscountPolicy discountPolicy) {
+//        this.discountPolicy = discountPolicy;
+//    }
+
+    @Autowired
+//    public OrderServiceImpl(MemberRepository memberRepository, @Qualifier("mainDiscountPolicy") DiscountPolicy discountPolicy) {
+//    public OrderServiceImpl(MemberRepository memberRepository, DiscountPolicy discountPolicy) {
+    public OrderServiceImpl(MemberRepository memberRepository, @MainDiscountPolicy DiscountPolicy discountPolicy) {
         this.memberRepository = memberRepository;
         this.discountPolicy = discountPolicy;
     }
