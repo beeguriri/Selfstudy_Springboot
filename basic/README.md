@@ -10,6 +10,7 @@
     - `lombok`
       - `File>Settings>Plugins`에서 `lombok` 설치
       - `File>Settings>Build, Execution, Deployment>Compiler>Annotation Processors`에서 `Enable` 체크
+    - `Spring Web`
 - IDE : IntelliJ
   - Settings > Build,Execution,Deployment > Build Tools > Gradle > Build and Run => `IntelliJ IDEA`
 - DB : ...
@@ -202,3 +203,61 @@ memberRepository = study.core.member.MemoryMemberRepository@7fcf2fc1
 - 해결3: `@Primary`
   - 우선순위를 지정
   - 여러개의 빈이 있으면 `@Primary`가 붙은 빈을 매칭함
+
+## 빈 생명주기
+- 객체 생성 -> 의존 관계 주입
+  - 예외 : 생성자주입은 객체 생성과 의존 관계 주입이 동시에 일어남
+- 이벤트 라이프 사이클 (싱글톤)
+  - 스프링 컨테이너 생성 -> 스프링 빈 생성 -> 의존관계 주입 -> 초기화 콜백 -> 사용 -> 소멸전 콜백 -> 스프링 종료
+- 객체의 생성과 초기화를 분리하자!
+
+### 빈 생명주기 콜백
+- ~~인터페이스(InitializingBean, DisposableBean)~~
+  - 현재는 잘 사용하지 않는 방법
+- 설정 정보에 초기화 메서드, 종료 메서드 지정
+  - `@Bean(initMethod = "init", destroyMethod = "close")`
+  - 메서드 이름을 자유롭게 줄 수 있다.
+  - 스프링 빈이 스프링 코드에 의존하지 않음
+  - 코드가 아니라 설정 정보를 사용하기 때문에, 코드를 고칠 수 없는 외부 라이브러리에도 초기화, 종료 메서드를 적용할 수 있음
+- **`@PostConstruct`, `@PreDestroy` 어노테이션 지원**
+  - 자바표준 `JSR-250`
+  - 스프링이 아닌 다른 컨테이너에서도 동작
+  - 컴포넌트 스캔과 잘 어울림
+  - 단점 : 외부 라이브러리에는 적용하지 못함 (외부라이브러리 초기화, 종료 할때는 @Bean 기능 사용하자)
+
+## 빈 스코프
+- 싱글톤: 기본 스코프, 스프링 컨테이너의 시작과 종료까지 유지되는 가장 넓은 범위의 스코프
+- 프로토타입: 스프링 컨테이너는 `프로토타입 빈의 생성과 의존관계 주입까지만 관여`하고 더는 관리하지 않는 매우 짧은 범위의 스코프
+- 웹 관련 스코프 : 웹환경에서만 동작. 스프링이 종료시점까지 관리
+  - request: 웹 요청이 들어오고 나갈때 까지 유지되는 스코프, `각 HTTP 요청마다` 별도의 빈 인스턴스가 생성되고 관리 됨
+  - session: 웹 세션이 생성되고 종료될 때 까지 유지되는 스코프
+  - application: 웹의 서블릿 컨텍스트와 같은 범위로 유지되는 스코프
+  - websocket : 웹소켓과 동일한 생명주기를 가지는 스코프
+- 싱글톤에서 프로토타입 빈을 사용하면 싱글톤 빈 생성 시점에 프로토타입이 주입받기때문에 싱글톤 빈과 함께 계속 유지
+- 프로토타입 빈을 사용할 때 마다 새로 생성해서 사용하는 것을 원할 경우
+  - 해결 1: `ObjectProvider` 사용
+    - `getObject()` 메서드 사용 
+    - 스프링컨테이너를 통해서 해당 빈을 찾아서 반환 : `DL(Dependency Lookup)`
+  - 해결 2: JSR-330 `Provider` 사용
+    - 스프링부트 2.xx : `javax.inject:javax.inject:1` gradle에 추가
+    - 스프링부트 3.xx : `jakarta.inject:jakarta.inject-api:2.0.1` gradle에 추가
+    - `get()` 메서드 사용
+    - 자바 표준이므로 스프링이 아닌 다른 컨테이너에서도 사용할 수 있음
+
+### Request 스코프 개발
+- 기대하는 공통 포멧: [UUID][requestURL] {message}
+- `@Scope(value = "request")` : HTTP 요청 당 하나씩 생성
+- uuid를 저장해두면 다른 HTTP 요청과 구분할 수 있음
+- requestURL은 빈이 생성되는 시점에는 알수 없으므로 외부에서 setter로 입력
+- 스프링 application 실행시키는 시점에는 request가 없으므로 request스코프가 활성화되지 않아서 빈 생성 오류 발생
+> Scope 'request' is not active for the current thread; consider defining a scoped proxy for this bean if you intend to refer to it from a singleton; ...
+- 해결 1 : `ObjectProvider` 사용해서 필요시점에 request scope 빈 생성
+  - ObjectProvider.getObject() 를 각각 호출해도 같은 HTTP 요청이면 같은 스프링 빈이 반환 됨!
+```text
+[57504e97-fb2b-4ca6-a14f-4949b22441a6] request scope bean create: study.core.common.MyLogger@76344ca3
+[57504e97-fb2b-4ca6-a14f-4949b22441a6][http://localhost:8080/log-demo] controller test
+[57504e97-fb2b-4ca6-a14f-4949b22441a6][http://localhost:8080/log-demo] service id = testId
+[57504e97-fb2b-4ca6-a14f-4949b22441a6] request scope bean close: study.core.common.MyLogger@76344ca3
+```
+- 해결 2 : `@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)`
+  - 스프링컨테이너가 CGLIB 라이브러리 사용해서 가짜 프록시 객체 생성
