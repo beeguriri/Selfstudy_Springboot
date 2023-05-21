@@ -149,5 +149,12 @@ AppConfig 호출 시 `MemoryMemberRepository` 세번 호출 할 것 같지만
 @Bean OrderService -> new MemoryMemberRepository();
 
 실제로는 한번만 호출하고 등록 된 빈 가져다 씀!
+call AppConfig.memberService
+call AppConfig.memberRepository
+call AppConfig.orderService
+
+memberService -> memberRepository1 = study.core.member.MemoryMemberRepository@7fcf2fc1
+orderService -> memberRepository2 = study.core.member.MemoryMemberRepository@7fcf2fc1
+memberRepository = study.core.member.MemoryMemberRepository@7fcf2fc1
 ```
 
