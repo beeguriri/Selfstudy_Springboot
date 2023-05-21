@@ -2,6 +2,8 @@ package study.core.singletone;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import study.core.AppConfig;
 import study.core.member.MemberService;
 
@@ -37,5 +39,23 @@ public class SingletonTest {
 
         //singletonService1 == singletonService2
         assertThat(singletonService1).isSameAs(singletonService2);
+    }
+
+    @Test
+    @DisplayName("스프링 컨테이너와 싱글톤")
+    void springContainer() {
+
+        ApplicationContext ac = new AnnotationConfigApplicationContext(AppConfig.class);
+
+        //1. 스프링 컨테이너에서 꺼내서 사용
+        MemberService memberService1 = ac.getBean("memberService", MemberService.class);
+        MemberService memberService2 = ac.getBean("memberService", MemberService.class);
+
+        //2. 참조값 같음
+        System.out.println("memberService1 = " + memberService1);
+        System.out.println("memberService2 = " + memberService2);
+
+        //memberService1 == memberService2
+        assertThat(memberService1).isSameAs(memberService2);
     }
 }
