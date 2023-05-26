@@ -6,7 +6,7 @@ const Home = () => {
     return (
         <div>
             홈화면 <br />
-            sessionStorage: {sessionStorage.item}
+            sessionStorage: {sessionStorage.getItem("user_id")}
             <ul>
                 <li><Link to="/Login">로그인</Link></li>
                 <li><Link to="/Join">회원가입</Link></li>
