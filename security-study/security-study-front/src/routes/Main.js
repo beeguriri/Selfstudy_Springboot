@@ -1,10 +1,10 @@
 import { Route, Routes } from "react-router-dom";
-import Home from "./Home";
-import Login from "./Login";
-import Join from "./Join";
+import Home from "../pages/Home";
+import Login from "../pages/Login";
+import Join from "../pages/Join";
+import LoginSuccess from "../pages/LoginSuccess";
 
 const Main = () => {
-
 
     return (
         <>
@@ -12,6 +12,8 @@ const Main = () => {
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/join" element={<Join />} />
+                <Route path="/success" element={<LoginSuccess />} />
+                <Route path="/logout" element={<Home />} />
             </Routes>
 
         </>
