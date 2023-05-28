@@ -24,18 +24,22 @@ const Home = () => {
     }
     
     return (
+        // <div>
+        //     홈화면 <br />
+        //     {isLogin ? (
+        //         <ul>
+        //             <li><Link to="/logout" onClick={logoutEvent}>로그아웃</Link></li>
+        //         </ul>
+        //     ) : (
+        //         <ul>
+        //             <li><Link to="/login">로그인</Link></li>
+        //             <li><Link to="/join">회원가입</Link></li>
+        //             <li><Link to="/success">로그인여부 확인</Link></li>
+        //         </ul>
+        //     )}
+        // </div>
         <div>
-            홈화면 <br />
-            {isLogin ? (
-                <ul>
-                    <li><Link to="/logout" onClick={logoutEvent}>로그아웃</Link></li>
-                </ul>
-            ) : (
-                <ul>
-                    <li><Link to="/Login">로그인</Link></li>
-                    <li><Link to="/Join">회원가입</Link></li>
-                </ul>
-            )}
+            
         </div>
 
 
