@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
 
-@Builder
 @Getter
 @Entity
 public class Member {
@@ -21,8 +20,7 @@ public class Member {
 
     private String roles;
 
-    private Member(Long id, String userid, String password, String roles) {
-        this.id = id;
+    public Member(String userid, String password, String roles) {
         this.userid = userid;
         this.password = password;
         this.roles = roles;

@@ -1,18 +1,27 @@
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
+import axios from "axios";
 
 const LoginSuccess = () => {
 
-    const logoutEvent = () => {
+    const onClickLogout = async () => {
         sessionStorage.removeItem("user_id")
-        // setIsLogin(false);
+        await axios
+            .get("http://localhost:8080/api/logout", {
+
+            })
+            .then((res) => {
+                console.log(res)
+                sessionStorage.removeItem("user_id")
+            })
     }
 
     return(
         <>
             로그인 성공 시 들어오는 페이지
-            <ul>
-                <li><Link to="/logout" onClick={logoutEvent}>로그아웃</Link></li>
-            </ul>
+            <button
+                type="button"
+            onClick={onClickLogout}
+            >로그아웃</button>
         </>
     );
 }

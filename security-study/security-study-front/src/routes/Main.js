@@ -9,8 +9,8 @@ const Main = () => {
     return (
         <>
             <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/login" element={<Login />} />
+                <Route path="/" element={<Login />} />
+                {/* <Route path="/login" element={<Login />} /> */}
                 <Route path="/join" element={<Join />} />
                 <Route path="/success" element={<LoginSuccess />} />
                 <Route path="/logout" element={<Home />} />
