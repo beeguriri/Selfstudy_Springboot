@@ -1,9 +1,19 @@
 ## 백엔드
-- 디펜던시
-- `Spring Web`   `Spring Data JPA `  `H2 Database`  `Lombok` `Spring Security`
+- 디펜던시 추가
+```java
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	compileOnly 'org.projectlombok:lombok'
+	runtimeOnly 'com.h2database:h2'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+```
 - 작업중 ...
-  - [ ] 없는 id 입력 될 경우 예외 처리
-  - [ ] 비밀번호 잘못 될 경우 예외 처리
+  - [x] 없는 id 입력 될 경우 예외 처리 : return id == null
+  - [x] 비밀번호 잘못 될 경우 예외 처리 : return password == null
 
 ## 프론트엔드
 - 설치
