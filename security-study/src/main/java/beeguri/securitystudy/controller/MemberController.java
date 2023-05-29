@@ -1,36 +1,27 @@
 package beeguri.securitystudy.controller;
 
 import beeguri.securitystudy.domain.Member;
-import beeguri.securitystudy.dto.MemberJoinDto;
 import beeguri.securitystudy.dto.MemberLoginDto;
 import beeguri.securitystudy.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("/api/user")
 public class MemberController {
 
     @Autowired
     MemberService memberService;
 
-    @PostMapping("/api/login")
-    public Member login(@RequestBody MemberLoginDto params){
-        return memberService.login(params);
+    @PostMapping("/login")
+    public ResponseEntity<Member> login(@RequestBody MemberLoginDto params){
+        return ResponseEntity.ok().body(memberService.login(params));
     }
 
-    @GetMapping("/api/logout")
-    public Member logout() {
-        return null;
-    }
-
-    @PostMapping("/api/join")
-    public void join(@RequestBody MemberJoinDto params) {
-        memberService.createMember(params);
-    }
-
-    @GetMapping("/api/test")
-    public @ResponseBody String test (){
-        return "test";
+    @GetMapping("/logout")
+    public ResponseEntity<Member> logout(@RequestBody MemberLoginDto params){
+        return ResponseEntity.ok().body(memberService.logout(params));
     }
 
 }
