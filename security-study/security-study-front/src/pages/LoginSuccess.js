@@ -1,28 +1,50 @@
-// import { Link } from "react-router-dom";
-import axios from "axios";
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const LoginSuccess = () => {
 
-    const onClickLogout = async () => {
-        sessionStorage.removeItem("user_id")
-        await axios
-            .get("http://localhost:8080/api/logout", {
+    const navigate = useNavigate();
 
+    // const onClickLogout = () => {
+    //     alert("로그아웃 합니다.")
+    //     sessionStorage.removeItem("isLoggedIn")
+    //     navigate("/")
+    // }
+
+    const onClickLogout = async () => {
+        await axios
+            .get("/api/user/logout", {
             })
-            .then((res) => {
-                console.log(res)
-                sessionStorage.removeItem("user_id")
+            .then((response) => {
+                console.log(response)
+                sessionStorage.removeItem("isLoggedIn")
+                window.location.href = "/";
             })
+            .catch((error) => {
+                console.log(error);
+            })
+        // sessionStorage.removeItem("isLoggedIn")
+
     }
 
-    return(
-        <>
-            로그인 성공 시 들어오는 페이지
-            <button
-                type="button"
-            onClick={onClickLogout}
-            >로그아웃</button>
-        </>
+    return (
+        <div>
+            {sessionStorage.getItem("isLoggedIn") ? (
+                <div>
+                    로그인 성공 시 보이는 화면 <br />
+                    {sessionStorage.getItem("isLoggedIn")}
+                    <button
+                        type="button"
+                        onClick={onClickLogout}
+                    >로그아웃</button>
+                </div>) : (
+                <div>
+                    false
+                    {window.location.href = "/"}
+                </div>
+                )
+            }
+        </div>
     );
 }
 
