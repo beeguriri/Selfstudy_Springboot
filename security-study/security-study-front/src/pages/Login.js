@@ -1,76 +1,61 @@
 import axios from "axios";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from 'react-router-dom';
 
 const Login = () => {
 
-    const [inputId, setInputId] = useState("");
-    const [inputPw, setInputPw] = useState("");
+    const [id, setId] = useState("");
+    const [password, setPassword] = useState("");
+    const [showErrorMessage, setShowErrorMessage] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-    const handleInputId = (e) => {
-        // console.log('handleInputId', e.target.value)
-        setInputId(e.target.value);
-    };
+    const navigate = useNavigate();
 
-    const handleInputPw = (e) => {
-        // console.log('handleInputPw', e.target.value)
-        setInputPw(e.target.value);
-    };
+    let response = null;
 
-    const onClickLogin = async () => {
-        console.log("click login");
-        console.log("ID : ", inputId);
-        console.log("PW : ", inputPw);
+    useEffect(() => {
+        setIsLoggedIn(true);
+    }, [response])
 
-        await axios
-            .post("http://localhost:8080/api/login", {
-                userid: inputId,
-                password: inputPw,
+    const handleLogin = async (e) => {
+        e.preventDefault();
+
+        response = await axios
+            .post('/api/user/login', {
+                userid: id,
+                password: password
             })
-            .then((res) => {
-                console.log("res", res);
-                if (res.data.userid === null) {
-                    // id 일치하지 않는 경우
-                    alert("일치하는 아이디가 없습니다.");
-                } else if (res.data.userid === inputId && res.data.password === null) {
-                    alert("비밀번호가 틀렸습니다.");
-                } else {
-                    alert("로그인 성공");
-                    sessionStorage.setItem("user_id", inputId); // sessionStorage에 id를 user_id라는 key 값으로 저장
-                    document.location.href = "/success";
-                }
-                // // 작업 완료 되면 페이지 이동(새로고침)
-                // document.location.href = "/success";
+            .then((response) => {
+                console.log(response.data); // 서버에서 반환한 데이터 출력
+                setShowErrorMessage(false);
+                sessionStorage.setItem('isLoggedIn', isLoggedIn)
+                navigate('/success')
             })
-            .catch(
-            );
+            .catch((error) => {
+                setShowErrorMessage(true);
+                console.log(error);
+            })
     };
 
     return (
         <>
-            로그인화면<br />
-            <br /><br />
-            <input
-                type="text"
-                className="form-control"
-                placeholder="아이디 입력"
-                name="input_id"
-                value={inputId}
-                onChange={handleInputId}
-            />
-            <br /><br />
-            <input
-                type="password"
-                className="form-control"
-                placeholder="비밀번호 입력"
-                name="input_pw"
-                value={inputPw}
-                onChange={handleInputPw}
-            />
-            <br /><br />
-            <button
-                type="button"
-            onClick={onClickLogin}
-            >로그인</button>
+            <div className="logindiv1">
+                <form className="loginform" onSubmit={handleLogin}>
+                    <div>
+                        <input type="text" id="id" value={id} placeholder="아이디"
+                            onChange={(e) => setId(e.target.value)} required />
+                    </div>
+                    <div>
+                        <input type="password" id="password" value={password} placeholder="비밀번호"
+                            onChange={(e) => setPassword(e.target.value)} required />
+                    </div>
+                    <button type="submit">로그인</button>
+                    {showErrorMessage && (
+                        <div className="logindiverror">ID 혹은 비밀번호가 일치하지 않습니다.</div>
+                    )}
+                </form>
+                <Link to="/join">회원가입</Link>
+            </div>
 
         </>
     )
