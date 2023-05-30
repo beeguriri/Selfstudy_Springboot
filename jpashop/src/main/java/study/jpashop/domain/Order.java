@@ -23,10 +23,12 @@ public class Order {
     @JoinColumn(name="member_id")
     private Member member;
 
-    @OneToMany(mappedBy = "order")
+    // order와 orderItems를 각각 저장해주어야  하나 (엔티티 당 persist 각각 호출)
+    // cascade => All 일 경우 order만 저장해주면 자동으로 orderItems 저장
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems = new ArrayList<>();
 
-    @OneToOne(fetch = FetchType.LAZY) //order에 access를 더 많이 하므로 fk를 order에 둠
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY) //order에 access를 더 많이 하므로 fk를 order에 둠
     @JoinColumn(name = "delivery_id")
     private Delivery delivery;
 
