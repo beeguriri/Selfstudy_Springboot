@@ -28,7 +28,8 @@ $ java -jar .\jpashop-0.0.1-SNAPSHOT.jar
 ---
 
 ## 요구사항 분석 및 설계
-![](https://github.com/beeguriri/Selfstudy_Springboot/blob/Spring_jpa/images/4_entity.png)
+![](https://github.com/beeguriri/Selfstudy_Springboot/blob/main/images/4_entity.png)
+
 ### 요구사항 분석
 - 회원기능
   - 회원 등록, 회원 조회
