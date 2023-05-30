@@ -26,7 +26,7 @@ public class Category {
 
 
     //같은 엔티티에 대해서 연관관계 매핑
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private Category parent;
 
