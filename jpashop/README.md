@@ -111,3 +111,35 @@ $ java -jar .\jpashop-0.0.1-SNAPSHOT.jar
   - cascade => All 일 경우 order만 저장해주면 자동으로 orderItems 저장/삭제
 - 양방향 연관관계 편의메서드
 
+## 도메인 개발
+### Test 설계
+- `@Transactional` : 테스트 실행 후 롤백
+  - 회원가입 메서드 검증 시, transaction commit 시점에 insert 쿼리가 나가므로
+  - @Transactional 어노테이션이 있으면 insert 쿼리가 실행되지 않고 롤백
+  - 쿼리 날라가는거 보기 위해 `flush` 해줌 
+    ```java
+    @Autowired EntityManager em;
+    ...
+    em.flush();
+    ```
+  - > o.s.t.c.transaction.TransactionContext   : Rolled back transaction for test
+- DB에 저장되는거 보기 위해서는 `@Rollback(false)`
+- 테스트 시 별도의 `application.yml` 만들어서 운영환경과 테스트 환경 분리해서 사용하자!
+  > 별도 application.yml 파일 없을때 (분리전)  
+  > connection 1| url jdbc:h2:tcp://localhost/~/jpashop
+  
+  > 메모리 DB 사용 시 (jdbc:h2:mem:test) (분리 후)
+  > connection 1| url jdbc:h2:mem:test
+  
+  > 별도 설정 없을 경우 (분리 후)  
+  > connection 2| url jdbc:h2:mem:bdc9394a...
+
+### 도메인 모델 패턴
+- 주문 서비스의 주문과 주문 취소 메서드를 보면 비즈니스 로직 대부분이 엔티티에 있다. 
+- 서비스 계층은 단순히 엔티티에 필요한 요청을 위임하는 역할을 한다.
+- [참고사이트](https://martinfowler.com/eaaCatalog/domainModel.html)
+
+### JPA에서 동적쿼리를 어떻게 해결하나?
+
+
+
