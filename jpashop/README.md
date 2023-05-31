@@ -11,10 +11,11 @@
       - SQL : `Spring Data JPA`  `H2 Database` 
       - DEVELOPER TOOLS : `Lombok`  `Spring Boot DevTools`
       - External Library : `com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.5.6`
-+ IDE : IntelliJ
-  + File > New > Project from Existing sources => `import`
-  + Settings > Build,Execution,Deployment > Build Tools > Gradle > Build and Run => `IntelliJ IDEA`
-+ DB : H2 `jdbc:h2:tcp://localhost/~/jpashop`
+      - I/O : `Validation`
+- IDE : IntelliJ
+  - File > New > Project from Existing sources => `import`
+  - Settings > Build,Execution,Deployment > Build Tools > Gradle > Build and Run => `IntelliJ IDEA`
+- DB : H2 `jdbc:h2:tcp://localhost/~/jpashop`
 
 ## 빌드하기
 ```bash
@@ -111,3 +112,74 @@ $ java -jar .\jpashop-0.0.1-SNAPSHOT.jar
   - cascade => All 일 경우 order만 저장해주면 자동으로 orderItems 저장/삭제
 - 양방향 연관관계 편의메서드
 
+## 도메인 개발
+### Test 설계
+- `@Transactional` : 테스트 실행 후 롤백
+  - 회원가입 메서드 검증 시, transaction commit 시점에 insert 쿼리가 나가므로
+  - @Transactional 어노테이션이 있으면 insert 쿼리가 실행되지 않고 롤백
+  - 쿼리 날라가는거 보기 위해 `flush` 해줌 
+    ```java
+    @Autowired EntityManager em;
+    ...
+    em.flush();
+    ```
+  - > o.s.t.c.transaction.TransactionContext   : Rolled back transaction for test
+- DB에 저장되는거 보기 위해서는 `@Rollback(false)`
+- 테스트 시 별도의 `application.yml` 만들어서 운영환경과 테스트 환경 분리해서 사용하자!
+  > 별도 application.yml 파일 없을때 (분리전)  
+  > connection 1| url jdbc:h2:tcp://localhost/~/jpashop
+  
+  > 메모리 DB 사용 시 (jdbc:h2:mem:test) (분리 후)
+  > connection 1| url jdbc:h2:mem:test
+  
+  > 별도 설정 없을 경우 (분리 후)  
+  > connection 2| url jdbc:h2:mem:bdc9394a...
+
+### 도메인 모델 패턴
+- 주문 서비스의 주문과 주문 취소 메서드를 보면 비즈니스 로직 대부분이 엔티티에 있다. 
+- 서비스 계층은 단순히 엔티티에 필요한 요청을 위임하는 역할을 한다.
+- [참고사이트](https://martinfowler.com/eaaCatalog/domainModel.html)
+
+### JPA에서 동적쿼리를 어떻게 해결하나?
+
+## 웹 계층 개발
+### Validation
+- `@Valid` : MemberForm에 있는 Validation 사용
+- `BindingResult` : 에러가 있으면 에러 저장 후 코드를 실행 함
+  ```java
+  @PostMapping(value = "/members/new")
+  public String create(@Valid MemberForm form, BindingResult result){
+  
+      // error가 있으면 => form으로 다시 가겠다!
+      if(result.hasErrors())
+          return "members/createMemberForm";
+      ...
+  }
+  ```
+
+### 참고
+- `Entity`는 핵심 비즈니스 로직만 가지고 있고, 화면을 위한 로직은 없어야 함
+  - 화면에 맞는 폼객체나 DTO객체 만들어서 사용하는 것을 권장
+  - API 만들때는 `Entity`를 절대 반환하면 안됨!!!
+
+### THYMELEAF [참고문서](https://www.thymeleaf.org/doc/articles/layouts.html)
+```html
+ <!-- form 안에서 객체를 쓰겠다! -->
+th:object="${memberForm}"
+
+<!-- object를 참고하겠다! -->
+th:field="*{name}"
+
+<!-- error 처리 -->
+th:class="${#fields.hasErrors('name')}
+
+<!-- for 순회 -->
+th:each="member : ${members}"
+
+<!-- null이면? 뒤에 진행 안해! -->
+th:text="${member.address?.city}"
+
+<!-- @ : url 명시 -->
+th:action="@{/items/new}"
+th:href="@{/items/{id}/edit (id=${item.id})}"
+```
