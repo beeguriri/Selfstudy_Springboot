@@ -8,7 +8,6 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -39,7 +38,7 @@ public class Order {
     private LocalDateTime orderDate;
 
     @Enumerated(EnumType.STRING)
-    private orderStatus status; // 주문상태 [order, cancel]
+    private OrderStatus status; // 주문상태 [order, cancel]
 
     // 양방향일때 연관관계 메서드 //
     public void setMember(Member member) {
@@ -68,7 +67,7 @@ public class Order {
         for (OrderItem orderItem : orderItems)
             order.addOrderItem(orderItem);
 
-        order.setStatus(orderStatus.ORDER);
+        order.setStatus(OrderStatus.ORDER);
         order.setOrderDate(LocalDateTime.now());
 
         return order;
@@ -81,7 +80,7 @@ public class Order {
         if (delivery.getStatus() == DeliveryStatus.COMP)
             throw new IllegalStateException("이미 배송 완료 된 상품은 취소가 불가능 합니다.");
 
-        this.setStatus(orderStatus.CANCEL);
+        this.setStatus(OrderStatus.CANCEL);
 
         // 재고 원복
         for (OrderItem orderItem : orderItems)
