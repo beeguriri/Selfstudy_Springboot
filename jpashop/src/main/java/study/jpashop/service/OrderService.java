@@ -1,7 +1,6 @@
 package study.jpashop.service;
 
 import lombok.RequiredArgsConstructor;
-import org.hibernate.event.spi.DeleteEvent;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import study.jpashop.domain.Delivery;
@@ -12,6 +11,7 @@ import study.jpashop.domain.item.Item;
 import study.jpashop.repository.ItemRepository;
 import study.jpashop.repository.MemberRepository;
 import study.jpashop.repository.OrderRepository;
+import study.jpashop.repository.OrderSearch;
 
 import java.util.List;
 
@@ -49,6 +49,7 @@ public class OrderService {
     }
 
     //취소 => 비지니스로직을 도메인에 만들어둠
+    @Transactional
     public void cancelOrder(Long orderId) {
 
         //주문 엔티티 조회
@@ -59,9 +60,10 @@ public class OrderService {
     }
 
     //검색
-//    public List<Order> findOrders(OrderSearch orderSearch) {
+    public List<Order> findOrders(OrderSearch orderSearch) {
 //        return orderRepository.findAll(orderSearch);
-//    }
+        return orderRepository.findAllByString(orderSearch);
+    }
 
 
 }
