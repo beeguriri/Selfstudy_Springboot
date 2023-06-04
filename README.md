@@ -15,3 +15,8 @@
 #### [`4. jpashop`](https://github.com/beeguriri/Selfstudy_Springboot/tree/main/jpashop)
 - 실전! 스프링 부트와 JPA 활용1 - 웹 애플리케이션 개발
 - 웹 애플리케이션 설계 및 개발
+
+#### [`5. jpashop2`](https://github.com/beeguriri/Selfstudy_Springboot/tree/main/jpashop2)
+- 실전! 스프링 부트와 JPA 활용2 - API 개발과 성능 최적화
+- RestAPI 개발 및 성능 최적화
+
