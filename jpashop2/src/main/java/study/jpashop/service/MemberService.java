@@ -32,6 +32,13 @@ public class MemberService {
         return member.getId();
     }
 
+    @Transactional
+    public void updateMember(Long id, String name){
+
+        Member member = memberRepository.findOne(id);
+        member.setName(name);
+    }
+
     // 중복 회원 검증
     // 실무에서는 멀티스레드 검증을 위해 name 에 unique 속성 줌
     private void validateDuplicateMember(Member member) {
@@ -51,4 +58,5 @@ public class MemberService {
     public Member findOne(Long memberId) {
         return memberRepository.findOne(memberId);
     }
+
 }
