@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import study.jpashop.domain.Address;
 import study.jpashop.domain.Order;
@@ -66,6 +67,7 @@ public class OrderApiController {
     //v3. fetch join
     //distinct keyword: jpa 에서 자체적으로 order 가 같은 id 값이면 중복을 제거하고 컬렉션에 담아줌
     //단점: oneToMany join 시 페이징 불가능해짐
+    //oneToMany 에서 one 을 기준으로 페이징을 하는 것이 목적이나, many 를 기준으로 row 가 생성됨.
     @GetMapping("/api/v3/orders")
     public List<OrderDto> ordersV3(){
 
@@ -74,6 +76,24 @@ public class OrderApiController {
         return orders.stream()
                         .map(o -> new OrderDto(o))
                         .collect(Collectors.toList());
+    }
+
+    //v3.1 페이징 기능 구현
+    //default_batch_fetch_size 설정으로 컬렉션의 N+1 해결!
+    @GetMapping("/api/v3.1/orders")
+    public List<OrderDto> ordersV3_page(@RequestParam(value = "offset", defaultValue = "0") int offset,
+                                        @RequestParam(value = "limit", defaultValue = "100") int limit){
+
+        //x to one 은 fetch join 으로 가져오기 (paging 에 영향을 주지 않음)
+        List<Order> orders = orderRepository.findAllWithMemberDelivery(offset, limit);
+
+        //default_batch_fetch_size 설정하면 In 쿼리를 날려줌
+        //size : In 쿼리 개수
+        //order_id in (4, 11);
+        //item_id in (2, 3, 9, 10);
+        return orders.stream()
+                .map(o -> new OrderDto(o))
+                .collect(Collectors.toList());
     }
 
     @Data
