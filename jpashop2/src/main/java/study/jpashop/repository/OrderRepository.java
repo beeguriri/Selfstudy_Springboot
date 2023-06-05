@@ -111,4 +111,15 @@ public class OrderRepository {
         ).getResultList();
     }
 
+    public List<Order> findAllWithItem() {
+
+        //jpa에서 자체적으로 order가 같은 id값이면 중복을 제거하고 컬렉션에 담아줌
+        return em.createQuery("select distinct o from Order o " +
+                        "join fetch o.member m " +
+                        "join fetch o.delivery d " +
+                        "join fetch o.orderItems oi " +
+                        "join fetch oi.item i", Order.class)
+                .getResultList();
+    }
+
 }

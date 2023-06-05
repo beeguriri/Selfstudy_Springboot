@@ -22,7 +22,7 @@ public class Member {
     private Address address;
 
     //1:n의 관계에서는 n 쪽이 주인! (order에 있는 member를 바꿈)
-//    @JsonIgnore
+    @JsonIgnore
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     private List<Order> orders = new ArrayList<>();
 
