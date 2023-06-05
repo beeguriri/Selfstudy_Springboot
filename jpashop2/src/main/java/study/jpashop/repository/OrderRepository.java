@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 import study.jpashop.domain.Order;
-import study.jpashop.repository.order.simplequery.SimpleOrderQueryDto;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;

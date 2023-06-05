@@ -1,7 +1,6 @@
 package study.jpashop.api;
 
 import lombok.Data;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -12,6 +11,8 @@ import study.jpashop.domain.OrderItem;
 import study.jpashop.domain.OrderStatus;
 import study.jpashop.repository.OrderRepository;
 import study.jpashop.repository.OrderSearch;
+import study.jpashop.repository.order.query.OrderQueryDto;
+import study.jpashop.repository.order.query.OrderQueryRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
 public class OrderApiController {
 
     private final OrderRepository orderRepository;
+    private final OrderQueryRepository orderQueryRepository;
 
     //v1. 엔티티 직접 노출
     @GetMapping("/api/v1/orders")
@@ -94,6 +96,14 @@ public class OrderApiController {
         return orders.stream()
                 .map(o -> new OrderDto(o))
                 .collect(Collectors.toList());
+    }
+
+    // v4.JPA에서 DTO 직접 조회
+    // ToOne 관계 한번 조회 후
+    // ToMany 관계는 각각 조회 (findItems() 라는 별도의 메서드로 조회)
+    @GetMapping("/api/v4/orders")
+    public List<OrderQueryDto> ordersV4(){
+        return orderQueryRepository.findOrderQueryDtos();
     }
 
     @Data
