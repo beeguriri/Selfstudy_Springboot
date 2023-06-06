@@ -61,18 +61,43 @@ public List<SimpleOrderDto> orderV3() {
 - One을 기준으로 페이징을 하는 것이 목적이나, 
 - many 를 기준으로 row 가 생성됨. (정규화X, 데이터 중복 발생)
 
-### ⭐default_batch_fetch_size⭐
+### ⭐엔티티 조회 (v3.1)⭐
 - x To One 은 `fetch join`을 해서 쿼리수를 줄이고, 
   - `x To One`은 paging 에 영향을 주지 않음
   - One To Many를 `fetch join` 하면 쿼리수는 줄어드나, 페이징 불가능
-- 컬렉션 지연로딩 최적화를 위하며  
-- `default_batch_fetch_size=100` 설정
-- > select ... where orderitems0_.order_id in (?, ?)
-    - => In 쿼리를 이용해서 쿼리 중복 줄여줌 (1+N -> 1+1)
-  - size에 따라 쿼리수가 한번에 나감
-    - 지연로딩이 발생하는 객체를 버퍼처럼 size개수만큼 모아놨다가, 
-    - default_batch_fetch_size로 지정한 개수가 다 차게 되면 쿼리가 발생함. 
-    - 예를들어 5로 setting 하면 in(1,2,3,4,5) 한번, in(6,7,8,9,10) 이런식으로 나감..
+- 컬렉션 지연로딩 최적화를 위해
+  - 페이징 필요 : `default_batch_fetch_size=100` 설정 
+  - > select ... where orderitems0_.order_id in (?, ?)
+      - => In 쿼리를 이용해서 쿼리 중복 줄여줌 (1+N -> 1+1)
+    - size에 따라 쿼리수가 한번에 나감
+      - 지연로딩이 발생하는 객체를 버퍼처럼 size개수만큼 모아놨다가, 
+      - default_batch_fetch_size로 지정한 개수가 다 차게 되면 쿼리가 발생함. 
+      - 예를들어 5로 setting 하면 in(1,2,3,4,5) 한번, in(6,7,8,9,10) 이런식으로 나감..
+  - 페이징필요X : `fetch join`
 
+### DTO 직접 조회
+- 컬렉션 조회 최적화 : (쿼리2) In절 활용 -> 조회결과를 메모리에 넣고 재조립하여 최적화 (v5)
+- 플랫 데이터 최적화 : (쿼리1) Join 결과를 그대로 조회 후 애플리케이션에서 원하는 모양으로 직접 변환 (v6)
 
 ## OSIV와 성능 최적화
+- Open Session In View / Open EntityManager In View
+- > spring.jpa.open-in-view is enabled by default.  
+  > Therefore, database queries may be performed during view rendering.   
+  > Explicitly configure spring.jpa.open-in-view to disable this warning
+- 서비스계층에서 Transaction 시작하는 시점에 Database connection 가져오고,
+- connection 반납 시점이 다름
+- 기본적으로 켜는게 좋은데 성능이 이슈가 될때는 끄고 씀
+
+### open-in-view = `true`
+- OSIV 켜져있으면 (default = true) Transaction이 끝나도 connection 반환 안함
+  - (== 영속성 컨텍스트를 끝까지 살려둠)
+    - API : API가 유저한테 반환 될 때까지
+    - 화면 : View Templete으로 렌더링 할 때까지
+  - 단점 : 커넥션 리소스를 너무 오래 들고있어서, 실시간 트래픽이 중요한 애플리케이션은 커넥션 모자랄 수 있음
+
+### open-in-view = `false`
+- OSIV OFF시 Transaction이 끝나면 connection 반환
+  - 지연로딩을 Transaction 안에서 모두 처리
+  - Transaction이 끝나기 전에 지연로딩을 강제로 호출 해 두어야 함
+- => `OrderQueryService`: 화면이나 API에 맞춘 서비스 만듦(주로 읽기 전용 Transaction 사용)
+
