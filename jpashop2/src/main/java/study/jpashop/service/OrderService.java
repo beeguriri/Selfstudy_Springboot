@@ -8,10 +8,7 @@ import study.jpashop.domain.Member;
 import study.jpashop.domain.Order;
 import study.jpashop.domain.OrderItem;
 import study.jpashop.domain.item.Item;
-import study.jpashop.repository.ItemRepository;
-import study.jpashop.repository.MemberRepository;
-import study.jpashop.repository.OrderRepository;
-import study.jpashop.repository.OrderSearch;
+import study.jpashop.repository.*;
 
 import java.util.List;
 
@@ -29,7 +26,7 @@ public class OrderService {
     public Long order(Long memberId, Long itemId, int count) {
 
         //엔티티 조회
-        Member member = memberRepository.findOne(memberId);
+        Member member = memberRepository.findById(memberId).get();
         Item item = itemRepository.findOne(itemId);
 
         //배송정보 생성

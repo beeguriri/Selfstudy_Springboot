@@ -11,12 +11,16 @@ import study.jpashop.domain.OrderItem;
 import study.jpashop.domain.OrderStatus;
 import study.jpashop.repository.OrderRepository;
 import study.jpashop.repository.OrderSearch;
+import study.jpashop.repository.order.query.OrderFlatDto;
+import study.jpashop.repository.order.query.OrderItemQueryDto;
 import study.jpashop.repository.order.query.OrderQueryDto;
 import study.jpashop.repository.order.query.OrderQueryRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.*;
 
 /**
  * Order
@@ -100,10 +104,35 @@ public class OrderApiController {
 
     // v4.JPA에서 DTO 직접 조회
     // ToOne 관계 한번 조회 후
-    // ToMany 관계는 각각 조회 (findItems() 라는 별도의 메서드로 조회)
+    // ToMany 관계는 각각 조회(-> N+1) (findItems() 라는 별도의 메서드로 조회)
     @GetMapping("/api/v4/orders")
     public List<OrderQueryDto> ordersV4(){
         return orderQueryRepository.findOrderQueryDtos();
+    }
+
+    // v5.JPA에서 DTO 직접 조회 (컬렉션 조회 최적화)
+    // 쿼리 두번으로 최적화
+    // ToOne 관계 한번 조회 후
+    // 컬렉션은 Map 에 저장(메모리)(->쿼리1번)해서 가져옴
+    @GetMapping("/api/v5/orders")
+    public List<OrderQueryDto> ordersV5(){
+        return orderQueryRepository.findAllByDto_optimization();
+    }
+
+    // v6.JPA에서 DTO 직접 조회 (플랫 데이터 최적화)
+    // 장점: 쿼리 한번으로 찾기
+    // 단점1 : 조인으로 인해 DB에서 애플리케이션에 전달하는 데이터에 중복 데이터 추가됨,
+    // 단점2 : (오더 기준으로) 페이징 불가능
+    @GetMapping("/api/v6/orders")
+    public List<OrderQueryDto> ordersV6(){
+        List<OrderFlatDto> flats = orderQueryRepository.findAllByDto_flat();
+
+        return flats.stream()
+                .collect(groupingBy(o -> new OrderQueryDto(o.getOrderId(), o.getName(), o.getOrderDate(), o.getOrderStatus(), o.getAddress()),
+                        mapping(o -> new OrderItemQueryDto(o.getOrderId(), o.getItemName(), o.getOrderPrice(), o.getCount()), toList())
+                )).entrySet().stream()
+                .map(e -> new OrderQueryDto(e.getKey().getOrderId(), e.getKey().getName(), e.getKey().getOrderDate(), e.getKey().getOrderStatus(), e.getKey().getAddress(), e.getValue()))
+                .collect(toList());
     }
 
     @Data

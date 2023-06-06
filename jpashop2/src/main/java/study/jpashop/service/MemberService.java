@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import study.jpashop.domain.Member;
 import study.jpashop.repository.MemberRepository;
+import study.jpashop.repository.MemberRepositoryOld;
 
 import java.util.List;
 
@@ -18,7 +19,7 @@ public class MemberService {
 
 //    @Autowired //생성자 인젝션, 생성자 하나일때는 생략 가능
 //    //memberService 호출할 때 의존관계 있음을 알려줌
-//    public MemberService(MemberRepository memberRepository) {
+//    public MemberService(MemberRepositoryOld memberRepository) {
 //        this.memberRepository = memberRepository;
 //    }
 
@@ -35,7 +36,7 @@ public class MemberService {
     @Transactional
     public void updateMember(Long id, String name){
 
-        Member member = memberRepository.findOne(id);
+        Member member = memberRepository.findById(id).get();
         member.setName(name);
     }
 
@@ -56,7 +57,7 @@ public class MemberService {
 
     // 한건 조회
     public Member findOne(Long memberId) {
-        return memberRepository.findOne(memberId);
+        return memberRepository.findById(memberId).get();
     }
 
 }
