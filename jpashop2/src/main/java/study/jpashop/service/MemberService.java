@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import study.jpashop.domain.Member;
-import study.jpashop.repository.MemberRepository;
+import study.jpashop.repository.MemberRepositoryOld;
 
 import java.util.List;
 
@@ -14,11 +14,11 @@ import java.util.List;
 @RequiredArgsConstructor //final 필드의 생성자 만들어줌
 public class MemberService {
 
-    private final MemberRepository memberRepository;
+    private final MemberRepositoryOld memberRepositoryOld;
 
 //    @Autowired //생성자 인젝션, 생성자 하나일때는 생략 가능
 //    //memberService 호출할 때 의존관계 있음을 알려줌
-//    public MemberService(MemberRepository memberRepository) {
+//    public MemberService(MemberRepositoryOld memberRepository) {
 //        this.memberRepository = memberRepository;
 //    }
 
@@ -27,7 +27,7 @@ public class MemberService {
     public Long join(Member member) {
 
         validateDuplicateMember(member); //중복 회원 검증
-        memberRepository.save(member);
+        memberRepositoryOld.save(member);
 
         return member.getId();
     }
@@ -35,7 +35,7 @@ public class MemberService {
     @Transactional
     public void updateMember(Long id, String name){
 
-        Member member = memberRepository.findOne(id);
+        Member member = memberRepositoryOld.findOne(id);
         member.setName(name);
     }
 
@@ -43,7 +43,7 @@ public class MemberService {
     // 실무에서는 멀티스레드 검증을 위해 name 에 unique 속성 줌
     private void validateDuplicateMember(Member member) {
         // Exception
-        List<Member> findMembers = memberRepository.findByName(member.getName());
+        List<Member> findMembers = memberRepositoryOld.findByName(member.getName());
 
         if(!findMembers.isEmpty())
             throw new IllegalStateException("이미 존재하는 회원입니다.");
@@ -51,12 +51,12 @@ public class MemberService {
 
     // 회원 전체 조회
     public List<Member> findMembers() {
-        return memberRepository.findAll();
+        return memberRepositoryOld.findAll();
     }
 
     // 한건 조회
     public Member findOne(Long memberId) {
-        return memberRepository.findOne(memberId);
+        return memberRepositoryOld.findOne(memberId);
     }
 
 }

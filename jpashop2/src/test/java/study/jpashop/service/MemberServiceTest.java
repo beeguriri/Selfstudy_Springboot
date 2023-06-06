@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import study.jpashop.domain.Member;
-import study.jpashop.repository.MemberRepository;
+import study.jpashop.repository.MemberRepositoryOld;
 
 import javax.persistence.EntityManager;
 
@@ -18,7 +18,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class MemberServiceTest {
 
     @Autowired MemberService memberService;
-    @Autowired MemberRepository memberRepository;
+    @Autowired
+    MemberRepositoryOld memberRepositoryOld;
     @Autowired EntityManager em;
 
     //em에서 persist를 할때는 쿼리 insert 문이 안나감
@@ -35,7 +36,7 @@ class MemberServiceTest {
 
         //then
         em.flush();
-        assertEquals(member, memberRepository.findOne(savedId));
+        assertEquals(member, memberRepositoryOld.findOne(savedId));
     }
 
     @Test

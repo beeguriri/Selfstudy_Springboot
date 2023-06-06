@@ -5,13 +5,11 @@ import org.springframework.stereotype.Repository;
 import study.jpashop.domain.Member;
 
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.PersistenceUnit;
 import java.util.List;
 
 @Repository //스프링부트의 컴포넌트 스캔 대상 => 스프링빈에 등록
 @RequiredArgsConstructor
-public class MemberRepository {
+public class MemberRepositoryOld {
 
 //    @PersistenceContext //jpa 제공 표준 어노테이션
 //    private EntityManager em; // 스프링이 EntityManager 만들어서 주입
