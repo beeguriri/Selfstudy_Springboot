@@ -18,7 +18,7 @@
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
-/src/main/generated/
+src/main/generated/study/jpashop
 
 # AWS User-specific
 .idea/**/aws.xml
