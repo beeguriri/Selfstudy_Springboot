@@ -18,6 +18,7 @@
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
+/src/main/generated/
 
 # AWS User-specific
 .idea/**/aws.xml
