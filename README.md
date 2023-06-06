@@ -20,3 +20,7 @@
 - 실전! 스프링 부트와 JPA 활용2 - API 개발과 성능 최적화
 - RestAPI 개발 및 성능 최적화
 
+#### [`6. mvc2`](https://github.com/beeguriri/Selfstudy_Springboot/tree/main/mvc2/thymeleaf-basic)
+- 스프링 MVC 2편 - 백엔드 웹 개발 활용 기술
+- 뷰 템플릿, 메시지, 국제화, 검증, 쿠키, 세션, 필터, 인터셉터, 예외 처리, 타입 컨버터, 파일 업로드
+
