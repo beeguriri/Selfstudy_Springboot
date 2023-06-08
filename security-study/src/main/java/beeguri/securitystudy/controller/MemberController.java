@@ -1,6 +1,7 @@
 package beeguri.securitystudy.controller;
 
 import beeguri.securitystudy.domain.Member;
+import beeguri.securitystudy.dto.MemberJoinDto;
 import beeguri.securitystudy.dto.MemberLoginDto;
 import beeguri.securitystudy.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,11 @@ public class MemberController {
     @GetMapping("/logout")
     public ResponseEntity<Member> logout(@RequestBody MemberLoginDto params){
         return ResponseEntity.ok().body(memberService.logout(params));
+    }
+
+    @PostMapping("/join")
+    public void join(@RequestBody MemberJoinDto params) {
+        memberService.createMember(params);
     }
 
 }
