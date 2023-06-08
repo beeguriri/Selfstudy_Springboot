@@ -2,7 +2,7 @@ import axios from "axios";
 
 const FileUpload = () => {
 
-    const fileList = []
+    let fileList = []
 
     const onSaveFile = (e) => {
 
@@ -11,6 +11,7 @@ const FileUpload = () => {
         uploadFile.forEach((element) => {
             fileList.push(element);
         });
+
     }
 
     const onFileUpload = () => {
@@ -34,6 +35,8 @@ const FileUpload = () => {
             data: formData,
 
         }).then((response) => {
+
+            fileList = []
             console.log("response 왔어용")
             console.log(response.data)
         })
