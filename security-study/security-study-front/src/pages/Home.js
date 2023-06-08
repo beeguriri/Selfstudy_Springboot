@@ -10,6 +10,7 @@ const Home = () => {
             .then((response) => {
                 console.log(response)
                 sessionStorage.removeItem("isLoggedIn")
+                sessionStorage.removeItem("id")
                 window.location.href = "/";
             })
             .catch((error) => {

@@ -19,6 +19,7 @@ const LoginSuccess = () => {
             .then((response) => {
                 console.log(response)
                 sessionStorage.removeItem("isLoggedIn")
+                sessionStorage.removeItem("userid")
                 window.location.href = "/";
             })
             .catch((error) => {

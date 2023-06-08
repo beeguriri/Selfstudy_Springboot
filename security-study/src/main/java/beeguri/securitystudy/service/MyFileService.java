@@ -1,7 +1,9 @@
 package beeguri.securitystudy.service;
 
+import beeguri.securitystudy.domain.Member;
 import beeguri.securitystudy.domain.MyFile;
 import beeguri.securitystudy.domain.MyFileList;
+import beeguri.securitystudy.repository.MemberRepository;
 import beeguri.securitystudy.repository.MyFileListRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
@@ -20,12 +22,14 @@ import java.util.*;
 public class MyFileService {
 
     private final MyFileListRepository myFileListRepository;
+    private final MemberRepository memberRepository;
 
-    public Long uploadFiles(MultipartFile[] multipartFiles) throws IOException {
+    public Long uploadFiles(String userid, MultipartFile[] multipartFiles) throws IOException {
 
         System.out.println("======service======");
         String UPLOAD_PATH = "D:\\temp";
         List<MyFile> list = new ArrayList<>();
+        Member member = memberRepository.findByUserid(userid).get();
 
         for (MultipartFile file : multipartFiles) {
 
@@ -51,7 +55,7 @@ public class MyFileService {
 
         }
 
-        MyFileList myFileList = MyFileList.createFileList(list);
+        MyFileList myFileList = MyFileList.createFileList(member, list);
         myFileListRepository.save(myFileList);
 
         return myFileList.getId();
@@ -63,8 +67,6 @@ public class MyFileService {
         System.out.println("id: " + id);
         List<MyFile> fileList = myFileListRepository.findById(id).get().getFileItems();
         List<String> list = fileList.stream().map(MyFile::getNewName).toList();
-        String listS = list.toString();
-        System.out.println("listS: " + listS);
 
         Map<String, List<String>> map= new HashMap<>();
         map.put("data", list);

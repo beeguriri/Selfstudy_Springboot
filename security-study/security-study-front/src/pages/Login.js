@@ -29,6 +29,7 @@ const Login = () => {
                 console.log(response.data); // 서버에서 반환한 데이터 출력
                 setShowErrorMessage(false);
                 sessionStorage.setItem('isLoggedIn', isLoggedIn)
+                sessionStorage.setItem('userid', id)
                 navigate('/success')
             })
             .catch((error) => {

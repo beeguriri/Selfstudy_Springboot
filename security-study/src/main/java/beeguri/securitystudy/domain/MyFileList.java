@@ -21,17 +21,27 @@ public class MyFileList {
     @OneToMany(mappedBy = "myFileList", cascade = CascadeType.ALL)
     private List<MyFile> fileItems = new ArrayList<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
+
     // 양방향일때 연관관계 메서드 //
     public void addFileItem(MyFile myFile){
         fileItems.add(myFile);
         myFile.setMyFileList(this);
     }
-//
+
+    public void setMember(Member member) {
+        this.member = member;
+        member.getReqList().add(this);
+    }
+
     //==생성메서드==//
-    public static MyFileList createFileList(List<MyFile> list){
+    public static MyFileList createFileList(Member member, List<MyFile> list){
 
         MyFileList myFileList = new MyFileList();
 
+        myFileList.setMember(member);
         myFileList.setRequestDate(LocalDateTime.now());
 
         for (MyFile myFile : list)
