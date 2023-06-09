@@ -27,7 +27,7 @@ public class MyFileService {
     public Long uploadFiles(String userid, MultipartFile[] multipartFiles) throws IOException {
 
         System.out.println("======service======");
-        String UPLOAD_PATH = "D:\\temp";
+        String UPLOAD_PATH = "D:\\Coding Practice\\driving-record-analysis-for-web-service\\flask\\files";
         List<MyFile> list = new ArrayList<>();
         Member member = memberRepository.findByUserid(userid).get();
 
@@ -71,7 +71,7 @@ public class MyFileService {
         Map<String, List<String>> map= new HashMap<>();
         map.put("data", list);
 
-        String flaskUrl = "http://localhost:5000/test";
+        String flaskUrl = "http://localhost:5000/file_processing";
 
         // RestTemplate 객체 생성
         // HTTP 통신을 위한 클래스. 이것을 WebClient로 바꿀 수 있다(비동기통신으로)
