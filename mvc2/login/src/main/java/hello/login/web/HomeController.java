@@ -45,7 +45,6 @@ public class HomeController {
     }
 
     @GetMapping("/")
-    //로그인 하지 않은 사용자도 들어와야 하므로 required = false
     public String homeLoginV2(HttpServletRequest request, Model model) {
 
         //세션 관리자에 저장 된 회원정보 조회
