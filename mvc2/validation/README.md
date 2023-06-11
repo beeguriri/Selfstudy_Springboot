@@ -10,7 +10,7 @@
   - errors.containsKey 하면 .. nullPointException 발생
 - 단점 : 타입 에러를 잡지는 못함 (400 에러 발생)
 
-#### 💜 Version 2 : BindingResult.addError()
+#### 💜 Version 2-1 : BindingResult.addError()
 - 스프링이 제공하는 검증 오류를 보관하는 객체
 - `순서중요` 항상 @modelAttribute 뒤에 BindingResult가 나와야 함
 ```java
@@ -60,7 +60,7 @@ bindingResult.addError(new FieldError("item", "price", item.getPrice(), false, n
 </div>
 ```
 
-#### 💜 Version 3 : BindingResult.rejectValue() + DefaultMessageCodesResolver
+#### 💜 Version 2-2 : BindingResult.rejectValue() + DefaultMessageCodesResolver
 ```java
 //필드명, 에러코드
 bindingResult.rejectValue("itemName", "required");
@@ -80,7 +80,7 @@ bindingResult.rejectValue("price", "range", new Object[]{1000, 1000000}, null);
     - code
    
 
-#### 💜 Version 4 : Validator 분리
+#### 💜 Version 2-3 : Validator 분리
 - `@InitBinder` 로 validator 호출
 - `@Validated` 어노테이션 사용
 ```java
@@ -93,3 +93,50 @@ public String addItemV6(@Validated @ModelAttribute Item item, BindingResult bind
     ...
 }
 ```
+
+#### 💜 Version 3-1 : Bean Validation
+- 의존관계 추가
+```java
+implementation 'org.springframework.boot:spring-boot-starter-validation'
+```
+- Item에 [validation 관련 어노테이션](https://docs.jboss.org/hibernate/validator/6.2/reference/en-US/html_single/#validator-defineconstraints-spec)을 붙이면 
+```java
+@NotBlank(message = "공백X")
+private String itemName;
+
+@NotNull //null 허용 안함
+@Range(min=1000, max=1000000) 
+private Integer price;
+```
+- 스프링부트는 자동으로 글로벌 Validator를 등록함
+- `@Validated`를 붙여서 등록 된 Validator를 사용할 수 있음
+- 검증 에러가 발생하면 bindingResult에 담아줌
+- 검증순서
+  - `@ModelAttibute` 각각의 필드에 타입 변환 시도
+    - 바인딩 성공한 필드만 validation 적용
+    - 실패하면 'typeMismatch', 'FieldError' 추가하고 validation 적용 하지 않음
+- `errors.properties`에 메시지 상세하게 설정 할 수 있음
+  - DefaultMessageCodesResolver -> 어노테이션의 기본메시지 속성 -> bean validation의 기본값
+- 오브젝트 에러는 `@ScriptAssert`로 해결할 수도 있지만
+- java 코드로 수행하는 것을 더 추천!
+
+#### 💜 Version 3-2 : Bean Validation (동일 모델 객체를 각각 다르게 검증)
+- 동일 모델 객체를 각각 다르게 검증해야할 때
+- BeanValidation의 `groups` 기능 사용
+- 잘 사용하지 않음
+
+#### 💜 Version 4 : 폼 전송객체 분리
+- ItemSaveForm, ItemUpdateForm 같은 별도의 모델 객체 만들어서 사용
+- 각각의 객체에 맞는 Validation 적용
+
+#### 💜 Version 5 : HTTP 메시지 컨버터
+- `@RequestBody`: HTTP Body의 데이터를 객체로 변환할 때 사용, 주로 API JSON 요청 다룰때 사용
+  - 객체 단위로 적용되므로 `HttpMessageConverter`단계에서 json binding이 안되면 
+  - controller 호출 자체가 안되므로, validated 적용이 안됨
+```java
+public Object addItem(@RequestBody @Validated ItemSaveForm form, BindingResult bindingResult){
+        ...
+}
+```
+- `@ModelAttribute`: HPPT 요청 파라미터(URL, 쿼리 스트링, POST Form)를 다룰 때 사용
+  - 필드 단위로 적용되므로 binding 된 데이터는 validated 적용 됨
