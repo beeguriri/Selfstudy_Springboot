@@ -19,7 +19,7 @@ out/
 src/main/generated
 !**/src/main/**/out/
 !**/src/test/**/out/
-
+.DS_Store
 
 # AWS User-specific
 .idea/**/aws.xml
