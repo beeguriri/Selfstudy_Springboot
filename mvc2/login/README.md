@@ -60,7 +60,7 @@ public String homeLoginV3Spring(
     
     //세션에 회원 데이터가 없으면 home
     if (loginMember == null)
-    return "home";
+        return "home";
   
     //세션이 유지되면 로그인홈으로 이동
     model.addAttribute("member", loginMember);
@@ -69,6 +69,109 @@ public String homeLoginV3Spring(
 }
 ```
 
-#### 💜 3. 필터
+#### 💜 3. 서블릿 필터
+- HTTP 요청 -> WAS -> 필터 -> 서블릿 -> 컨트롤러
+- HTTP 요청 -> WAS -> 필터(적절하지 않은 요청 -> 서블릿호출 X)
+- 모든 고객의 요청 로그를 남기는 요구사항이 있다면 필터를 사용
+```java
+// WebConfig에 Filter 설정
+@Bean
+public FilterRegistrationBean logFilter() {
 
-#### 💜 4. 인터셉터
+      FilterRegistrationBean<Filter> filterRegistrationBean = new FilterRegistrationBean<Filter>();
+      
+      filterRegistrationBean.setFilter(new LogFilter());
+      filterRegistrationBean.setOrder(1);
+      filterRegistrationBean.addUrlPatterns("/*");
+      
+      return filterRegistrationBean;
+}
+
+// LoginCheckFilter 구현
+public class LoginCheckFilter implements Filter {
+
+    //인증과 무관하게 항상 허용하는 리소스
+    private static final String[] whiteList = {"/", "/members/add", "/login", "/logout", "/css/*"};
+    
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+    
+    HttpServletRequest httpRequest = (HttpServletRequest) request;
+    String requestURI = httpRequest.getRequestURI();
+    HttpServletResponse httpResponse = (HttpServletResponse) response;
+    
+    try{
+      log.info("인증 체크 필터 시작 {}", requestURI);
+    
+      if(isLoginCheckPath(requestURI)) {
+        log.info("인증 체크 로직 실행 {}", requestURI);
+        HttpSession session = httpRequest.getSession(false);
+    
+        if(session == null || session.getAttribute(SessionConst.LOGIN_MEMBER) == null) {
+    
+          log.info("미인증 사용자 요청 {}", requestURI);
+    
+          //로그인으로 redirect
+          //로그인 성공하면 현재페이지로 돌아올 수 있게 redirect 정보 넣어줌
+          httpResponse.sendRedirect("/login?redirectURL=" + requestURI);
+    
+          return; //미인증 사용자는 다음으로 진행하지않고 종료!
+        }
+      }
+      chain.doFilter(request, response);
+    
+    } catch (Exception e) {
+      throw e;
+    
+    } finally {
+      log.info("인증 체크 필터 종료 {}", requestURI);
+    }
+}
+```
+
+#### 💜 4. 스프링 인터셉터
+- 스프링 MVC가 제공하는 기술
+- HTTP 요청 -> WAS -> 필터 -> (디스패처)서블릿 -> 스프링 인터셉터 -> 컨트롤러
+- HTTP 요청 -> WAS -> 필터 -> 서블릿 -> 스프링인터셉터(적절하지 않은 요청 -> 컨트롤러 호출X)
+- 로그인 여부 체크하기 좋음
+```java
+//WebMvcConfigurer 구현, 인터셉터 등록
+public class WebConfig implements WebMvcConfigurer {
+    
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+      
+      ...
+      
+      registry.addInterceptor(new LoginCheckInterceptor())
+              .order(2)
+              .addPathPatterns("/**") //모든 경로 허용
+              .excludePathPatterns("/", "/members/add", "/login", "/logout",
+                      "/css/**", "/*.ico", "/error"); //허용하지않을 경로
+    }
+}
+
+//LoginCheckInterceptor 구현
+public class LoginCheckInterceptor implements HandlerInterceptor {
+
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+  
+      String requestURI = request.getRequestURI();
+  
+      log.info("인증 체크 인터셉터 실행 {}", requestURI);
+  
+      HttpSession session = request.getSession(false);
+  
+      if(session == null || session.getAttribute(SessionConst.LOGIN_MEMBER)==null) {
+        log.info("미인증 사용자 요청");
+  
+        //로그인으로 redirect
+        response.sendRedirect("/login?redirectURL="+requestURI);
+  
+        return false;
+      }
+  
+      return true;
+}
+```
