@@ -71,8 +71,22 @@ public class ValidationItemControllerV3 {
     }
 
     @PostMapping("/{itemId}/edit")
-    public String edit(@PathVariable Long itemId, @ModelAttribute Item item) {
+    public String edit(@PathVariable Long itemId, @Validated @ModelAttribute Item item, BindingResult bindingResult) {
+
+        // 특정 필드가 아닌 복합 룰 검증 가격*수량의 합 10,000 이상
+        if(item.getPrice() != null && item.getQuantity() !=null)
+            if(item.getPrice() * item.getQuantity() < 10000)
+                bindingResult.reject("totalPriceMin", new Object[]{10000, item.getPrice() * item.getQuantity()}, null);
+
+        //검증에 실패하면 다시 입력 폼으로
+        if(bindingResult.hasErrors()){
+            log.info("errors={}", bindingResult);
+            return "validation/v3/editForm";
+        }
+
+        //검증에 성공하면 수행하는 로직
         itemRepository.update(itemId, item);
+
         return "redirect:/validation/v3/items/{itemId}";
     }
 
