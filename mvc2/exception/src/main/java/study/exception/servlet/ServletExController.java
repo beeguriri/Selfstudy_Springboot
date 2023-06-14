@@ -16,9 +16,9 @@ public class ServletExController {
         throw new RuntimeException("예외 발생");
     }
 
-    @GetMapping("error-404")
-    public void error404(HttpServletResponse response) throws IOException {
-        response.sendError(404, "404 오류!"); //설정한 message는 default로 안보이게 되있음. 보이게 하려면 별도 옵션 설정
+    @GetMapping("error-400")
+    public void error400(HttpServletResponse response) throws IOException {
+        response.sendError(400, "404 오류!"); //설정한 message는 default로 안보이게 되있음. 보이게 하려면 별도 옵션 설정
     }
 
     @GetMapping("error-500")
