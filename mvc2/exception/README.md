@@ -1,0 +1,46 @@
+## Exception
+
+### 서블릿 예외처리
+- Exception
+  - **Exception 기본 상태코드 : `HTTP Status 500`**
+- response.sendError(HTTP 상태 코드, 오류 메시지)
+> 1. WAS(/error-ex, dispatchType=REQUEST) -> 필터 -> 서블릿 -> 인터셉터 -> 컨트롤러  
+> 2. WAS(여기까지 전파) <- 필터 <- 서블릿 <- 인터셉터 <- 컨트롤러(예외발생)  
+> 3. WAS 오류 페이지 확인  
+> 4. WAS(/error-page/500, dispatchType=ERROR) -> 필터(x) -> 서블릿 -> 인터셉터(x) -> 컨트롤러(/error-page/500) -> View
+- 필터, 인터셉터가 두번 호출 되는 것을 방지하기 위해
+  - 필터는 DispatchType 으로 중복 호출 제거 ( dispatchType=REQUEST : default)
+  - 인터셉터는 경로 정보로 중복 호출 제거( excludePathPatterns("/error-page/**") )
+
+### 스프링부트 예외처리
+- 스프링부트가 ErrorPage 를 `/error` 라는 경로로 기본 오류 페이지를 설정함.
+- `BasicErrorController` 라는 스프링 컨트롤러를 자동으로 등록 (`/error` 를 매핑해서 처리하는 컨트롤러)
+- 에러 공통처리가 필요할 경우 `BasicErrorController` 상속받아서 기능 추가 구현
+
+### API 예외처리
+- 오류 응답 스펙을 정하고, JSON 으로 데이터를 내려줘야함
+  - request header 에 `Accept`를 `application/json` 으로 해주면
+  - `BasicErrorController`가 알아서 json 형태로 보내줌
+
+#### HandlerExceptionResolver
+- 예외 상태코드를 변환 
+  - 예외는 500 서버에러로 전달되므로
+  - request 에러일때는 400으로 변환해서 서블릿으로 전달
+- API 응답 처리
+  - response.getWriter().println("hello")처럼 HTTP 응답바디에 직접 데이터 넣어줌
+```java
+//MyHandlerExceptionResolver.java : 내가 만든 HandlerException
+public class MyHandlerExceptionResolver implements HandlerExceptionResolver {
+  ...
+  //예외를 먹고 서버에 400이라고 전달
+  response.sendError(HttpServletResponse.SC_BAD_REQUEST, ex.getMessage()); 
+  ...
+}
+```
+```java
+//WebConfig.java 에 내가 만든 HandlerException 등록
+@Override
+public void extendHandlerExceptionResolvers(List<HandlerExceptionResolver> resolvers) {
+  resolvers.add(new MyHandlerExceptionResolver());
+}
+```
