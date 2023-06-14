@@ -29,6 +29,15 @@
 - API 응답 처리
   - response.getWriter().println("hello")처럼 HTTP 응답바디에 직접 데이터 넣어줌
 ```java
+//MyHandlerExceptionResolver.java : 내가 만든 HandlerException
+public class MyHandlerExceptionResolver implements HandlerExceptionResolver {
+  ...
+  //예외를 먹고 서버에 400이라고 전달
+  response.sendError(HttpServletResponse.SC_BAD_REQUEST, ex.getMessage()); 
+  ...
+}
+```
+```java
 //WebConfig.java 에 내가 만든 HandlerException 등록
 @Override
 public void extendHandlerExceptionResolvers(List<HandlerExceptionResolver> resolvers) {
