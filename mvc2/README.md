@@ -147,7 +147,14 @@ public class ExControllerAdvice {
   ...
 }
 ```
+## [7. 스프링 타입 컨버터](https://github.com/beeguriri/Selfstudy_Springboot/tree/main/mvc2/typeconverter)
+- HTTP 요청 파라미터는 모두 문자로 처리됨
+- 스프링 타입컨버터 적용: @RequestParam, @PathVariable, @ModelAttribute
+  - JSON 결과로 만들어지는 숫자나 날짜의 포맷 변경은 컨버전 서비스와 전혀 관계가 없음
+- DefaultFormattingConversionServie 구현체로 converter와 formatter 등록해서 사용가능 (WebConfig에 등록)
+- Converter: 객체 -> 객체
+- Formatter: 객체 -> 문자, 문자 -> 객체 + 현지화(Locale)
+  - 객체를 문자로 변경: String print(T object, Locale locale)
+  - 문자를 객체로 변경: T parse(String text, Locale locale)
 
-**8. 스프링 타입 컨버터**
-
-**9. 파일 업로드**
+**8. 파일 업로드**
