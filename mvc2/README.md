@@ -115,10 +115,38 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
 }
 ```
 
+## [6. 예외 처리와 오류 페이지](https://github.com/beeguriri/Selfstudy_Springboot/tree/main/mvc2/exception)
+- API 예외처리 : 오류 응답 스펙을 정하고, JSON 으로 데이터를 내려줘야함
+- ExceptionHandlerExceptionResolver
+  - 컨트롤러에서 예외가 발생해도 서블릿 컨테이너까지 예외가 전달되지 않고
+  - 스프링 MVC에서 예외처리가 끝이 남
+  - ⭐`@ExceptionHandler`⭐
+    - 특정 컨트롤러에서만 발생하는 예외를 별로도 처리
+    - ExceptionResolver중 우선순위가 가장 높음
+    - `@RestControllerAdvice`로 `@RestController`에서 분리해서 사용
+```java
+//Controller
+//package나 annotation 기반 등으로 별도 지정해줄 수 있음
+@RestControllerAdvice(basePackages = "study.exception.api")
+public class ExControllerAdvice {
+  ...
 
-**6. 예외 처리와 오류 페이지**
+    @ExceptionHandler
+    public ResponseEntity<ErrorResult> userExHandler(UserException e) {
+        log.error("[exceptionHandler] ex", e);
+        ErrorResult errorResult = new ErrorResult("USER-EX", e.getMessage());
+        return new ResponseEntity<>(errorResult, HttpStatus.BAD_REQUEST);
+    }
 
-**7. API 예외 처리**
+    @ResponseStatus(HttpStatus.BAD_REQUEST) //응답코드 지정
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ErrorResult illegalExHandler(IllegalArgumentException e) {
+      log.error("[exceptionHandler] ex", e);
+      return new ErrorResult("BAD", e.getMessage());
+    }
+  ...
+}
+```
 
 **8. 스프링 타입 컨버터**
 
