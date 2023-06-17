@@ -3,9 +3,12 @@ package study.exception.api;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
+import study.exception.exception.BadRequestException;
 import study.exception.exception.UserException;
 
 @Slf4j
@@ -24,6 +27,16 @@ public class ApiExceptionController {
             throw new UserException("사용자 오류");
 
         return new MemberDto(id, "hello " + id);
+    }
+
+    @GetMapping("/api/response-status-ex1")
+    public String responseStatusEx1() {
+        throw new BadRequestException();
+    }
+
+    @GetMapping(value = "/api/response-status-ex2")
+    public String responseStatusEx2() {
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "error.bad", new IllegalArgumentException());
     }
 
     @Data
