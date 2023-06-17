@@ -193,6 +193,10 @@ th:object="${memberForm}"
 <!-- object를 참고하겠다! -->
 th:field="*{name}"
 
+<!-- th:field, th: value -->
+th:field: 자동으로 타입컨버터 적용
+th:value: *{name} : object.toString(), *{{name}} : 타입컨버터 적용
+
 <!-- error 처리 -->
 th:class="${#fields.hasErrors('name')}
 
