@@ -157,4 +157,11 @@ public class ExControllerAdvice {
   - 객체를 문자로 변경: String print(T object, Locale locale)
   - 문자를 객체로 변경: T parse(String text, Locale locale)
 
-**8. 파일 업로드**
+## [8. 파일 업로드](https://github.com/beeguriri/Selfstudy_Springboot/tree/main/mvc2/upload)
+- ⭐`MultipartFile`⭐사용
+- 업로드
+  - 파일은 서버나 특정 경로에 저장해놓고 사용
+  - DB에는 그 경로 정보만 저장함
+-  다운로드
+  - UrlResource("file:" + fileStore.getFullPath(filename))로 파일에 접근
+  - response header에 `contentDisposition` 명시
