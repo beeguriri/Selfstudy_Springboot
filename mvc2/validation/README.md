@@ -138,5 +138,5 @@ public Object addItem(@RequestBody @Validated ItemSaveForm form, BindingResult b
         ...
 }
 ```
-- `@ModelAttribute`: HPPT 요청 파라미터(URL, 쿼리 스트링, POST Form)를 다룰 때 사용
+- `@ModelAttribute`: HTTP 요청 파라미터(URL, 쿼리 스트링, POST Form)를 다룰 때 사용
   - 필드 단위로 적용되므로 binding 된 데이터는 validated 적용 됨
