@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class TeamRepository {
+public class TeamJPARepository {
 
     @PersistenceContext
     private EntityManager em;
