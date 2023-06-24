@@ -295,4 +295,20 @@ class MemberRepositoryTest {
 
         //then
     }
+    
+    @Test
+    public void queryHint() throws Exception {
+        //given
+        Member member1 = new Member("member1", 10);
+        memberRepository.save(member1);
+        em.flush();
+        em.clear();
+        
+        //when
+        Member findMember = memberRepository.findReadOnlyByUsername("member1");
+        findMember.setUsername("member2");
+        em.flush(); //hint : readOnly true : 변경감지(dirty checking) -> update query 안함
+
+        //then
+    }
 }
