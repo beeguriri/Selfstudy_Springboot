@@ -10,10 +10,10 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 //연관관계필드는 toString 안하는게 좋음
 @ToString(of = {"id", "username", "age"})
-//@NamedQuery(
-//        name = "Member.findByUsername",
-//        query = "select m from Member m where m.username = :username"
-//)
+@NamedQuery(
+        name = "Member.findByUsername",
+        query = "select m from Member m where m.username = :username"
+)
 public class Member {
 
     @Id
