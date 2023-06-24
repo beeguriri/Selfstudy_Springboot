@@ -24,3 +24,6 @@
 - 스프링 MVC 2편 - 백엔드 웹 개발 활용 기술
 - 뷰 템플릿, 메시지, 국제화, 검증, 쿠키, 세션, 필터, 인터셉터, 예외 처리, 타입 컨버터, 파일 업로드
 
+#### [`7. data-jpa`](https://github.com/beeguriri/Selfstudy_Springboot/tree/main/data-jpa)
+- 실전! 스프링 데이터 JPA
+- 스프링 데이터 JPA 활용
