@@ -67,5 +67,66 @@ public void changeTeam(Team team){
 }
 ```
 
-### 💜 Repository 설계
+### 💜 쿼리 메서드
+- [쿼리 메서드 필터 조건](https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#jpa.query-methods.query-creation)
+  - 조회 : find...By() => 괄호안에 where 절 조건
+    - Distinct : findMemberDistinctBy()
+    - Limit : findTop3()
+  - 파라미터가 많아지면 메서드명이 너무 길어짐
+- JPA NamedQuery
+  - entity 에 NamedQuery 선언
+  - NamedQuery 를 먼저 찾고 없으면 메서드 이름으로 쿼리 생성
+  - application loading 시점에 오류(오타 등) 잡을 수 있음
+  - 실무에서는 잘 안쓰는 기능
+- Repository 에 Query 정의
+  - application loading 시점에 오류(오타 등) 잡을 수 있음
+```java
+@Query("select m from Member m where m.username = :username and m.age = :age")
+List<Member> findUser(@Param("username") String username, @Param("age") int age);
+```
+  - DTO 로 조회하기
+```java
+@Query("select new study.datajpa.dto.MemberDto(m.id, m.username, t.name) from Member m join m.team t")
+List<MemberDto> findMemberDto();
+```
+- 파라미터 바인딩
+  - 파라미터로 collection 받을 경우 in 절 지원
+```java
+@Query("select m from Member m where m.username in :names")
+List<Member> findByNames(@Param("names") Collection<String> names);
+```
+- 페이징 기능
+```java
+//MemberRepository
+Page<Member> findByAge(int age, Pageable pageable);
 
+//Test
+//0page에서 3개 가져오기
+PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "username"));
+Page<Member> page = memberRepository.findByAge(age, pageRequest);
+
+//관련메서드
+page.getNumber() //현재 페이지의 번호
+page.getTotalPages()
+page.isFirst() //첫번쨰 페이지냐?
+page.hasNext() //다음페이지가 있냐?
+        ...
+```
+- 벌크성 수정쿼리
+  - 주의 : 벌크 연산 이후에는 영속성컨텍스트 다 날려버려야됨!
+    - 벌크 연산을 날리면 JPA 는 변경을 감지하지 못하고 있어서
+    - DB와 영속성 컨텍스트 내의 엔티티가 다른 값을 가짐
+```java
+@Modifying(clearAutomatically = true)
+@Query("update Member m set m.age = m.age + 1 where m.age >= :age")
+int bulkAgePlus(@Param("age") int age);
+```
+
+- 엔티티 그래프(EntityGraph)
+  - xToOne 지연로딩일때 내부적으로 `fetch join` 실행 됨
+  - 간단한 경우에 사용
+```java
+@Override
+@EntityGraph(attributePaths = {"team"})
+List<Member> findAll();
+```
