@@ -3,6 +3,9 @@ package study.datajpa.repository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import study.datajpa.dto.MemberDto;
@@ -191,5 +194,35 @@ class MemberRepositoryTest {
         System.out.println("findList = " + findList); //empty collection
         System.out.println("findMember = " + findMember); //null
         System.out.println("findOptionalMember = " + findOptionalMember); //Optional.empty
+    }
+
+    @Test
+    public void paging() throws Exception {
+        //given
+        memberRepository.save(new Member("member1", 10));
+        memberRepository.save(new Member("member2", 10));
+        memberRepository.save(new Member("member3", 10));
+        memberRepository.save(new Member("member4", 10));
+        memberRepository.save(new Member("member5", 10));
+
+        int age = 10;
+        PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "username"));//0page에서 3개 가져오기
+
+        //when
+        //반환타입이 page 이므로 jpa 가 count 쿼리를 날림
+        Page<Member> page = memberRepository.findByAge(age, pageRequest);
+        //내보낼때는 반드시 dto 객체로 내보내기
+        Page<MemberDto> map = page.map(m -> new MemberDto(m.getId(), m.getUsername(), null));
+
+        //then
+        List<Member> content = page.getContent();
+        long totalElements = page.getTotalElements();
+
+        assertThat(content.size()).isEqualTo(3);
+        assertThat(page.getTotalElements()).isEqualTo(5);
+        assertThat(page.getNumber()).isEqualTo(0); //현재 페이지의 번호
+        assertThat(page.getTotalPages()).isEqualTo(2);
+        assertThat(page.isFirst()).isTrue(); //첫번쨰 페이지냐?
+        assertThat(page.hasNext()).isTrue(); //다음페이지가 있냐?
     }
 }
