@@ -13,4 +13,4 @@ spring:
         format_sql: true # 쿼리 포맷팅
 logging.level:
   org.hibernate.SQL: debug #jpa 실행 쿼리를 로그로 남기기
-#  org.hibernate.type: trace #파라미터 바인딩 된 것 까지 볼 수 있음
+#  org.hibernate.type: trace #파라미터 바인딩 된 것 까지 볼 수 있음(보기 불편해서 p6spy 외부 라이브러리 사용)
