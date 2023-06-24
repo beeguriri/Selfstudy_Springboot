@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url: jdbc:h2:tcp://localhost/~/data-jpa
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+#        show_sql: true #jpa 실행 쿼리를 콘솔에 찍음
+        format_sql: true # 쿼리 포맷팅
+logging.level:
+  org.hibernate.SQL: debug #jpa 실행 쿼리를 로그로 남기기
+#  org.hibernate.type: trace #파라미터 바인딩 된 것 까지 볼 수 있음(보기 불편해서 p6spy 외부 라이브러리 사용)
