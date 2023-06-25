@@ -11,6 +11,14 @@ spring:
       hibernate:
 #        show_sql: true #jpa 실행 쿼리를 콘솔에 찍음
         format_sql: true # 쿼리 포맷팅
+  data:
+    web:
+      pageable:
+        default-page-size: 10
+        max-page-size: 2000
+        #페이지 1부터 시작하기
+        #페이지 객체에는 0부터 시작하는걸로 데이터 들어있어서 한계가 있음
+#        one-indexed-parameters: true
 logging.level:
   org.hibernate.SQL: debug #jpa 실행 쿼리를 로그로 남기기
 #  org.hibernate.type: trace #파라미터 바인딩 된 것 까지 볼 수 있음(보기 불편해서 p6spy 외부 라이브러리 사용)
