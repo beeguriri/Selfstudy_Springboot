@@ -3,9 +3,7 @@ package study.datajpa.repository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import study.datajpa.dto.MemberDto;
@@ -319,5 +317,34 @@ class MemberRepositoryTest {
         //when
         
         //then
+    }
+
+    @Test
+    public void queryByExample() throws Exception {
+        //given
+        Team teamA = new Team("teamA");
+        em.persist(teamA);
+
+        em.persist(new Member("m1", 0, teamA));
+        em.persist(new Member("m2", 0, teamA));
+        em.flush();
+        em.clear();
+
+        //when
+        //Probe
+        //도메인 객체로 example 을 만듦
+        //한계 : inner join 만 가능, 매칭 조건이 너무 단순함 (==만 사용)
+        Member member = new Member("m1");
+        Team team = new Team("teamA");
+        member.setTeam(team);
+
+        ExampleMatcher matcher = ExampleMatcher.matching()
+                                                .withIgnorePaths("age");
+
+        Example<Member> example = Example.of(member, matcher);
+        List<Member> result = memberRepository.findAll(example);
+
+        //then
+        assertThat(result.get(0).getUsername()).isEqualTo("m1");
     }
 }
