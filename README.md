@@ -27,3 +27,7 @@
 #### [`7. data-jpa`](https://github.com/beeguriri/Selfstudy_Springboot/tree/main/data-jpa)
 - 실전! 스프링 데이터 JPA
 - 스프링 데이터 JPA 활용
+
+#### [`8. querydsl`](https://github.com/beeguriri/Selfstudy_Springboot/tree/main/querydsl)
+- 실전! Querydsl
+- 스프링 데이터 JPA와 Querydsl
