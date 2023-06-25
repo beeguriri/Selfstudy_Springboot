@@ -130,3 +130,105 @@ int bulkAgePlus(@Param("age") int age);
 @EntityGraph(attributePaths = {"team"})
 List<Member> findAll();
 ```
+
+### 💜 사용자정의 리포지토리 구현
+- 별도의 interface 작성 및 구현클래스 작성 후
+  - 구현체클래스의 이름 규칙 : `MemberRepository` + `Impl` 
+  - 최신 ver. 구현체클래스의 이름 규칙 : `커스텀Interface명` + `Impl`
+- JpaRepository 상속한 Repository 에 추가해주기
+```java
+public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryCustom {
+  ...
+}
+```
+
+### 💜 Auditing
+- 엔티티 생성, 변경 할 때 변경한 사람과 시간 추적하기
+```java
+//Auditing Class 만들고
+@EntityListeners(AuditingEntityListener.class)
+@MappedSuperclass
+@Getter
+public class BaseEntity {
+
+  //생성일, 수정일
+  @CreatedDate
+  @Column(updatable = false)
+  private LocalDateTime createdDate;
+
+  @LastModifiedDate
+  private LocalDateTime lastModifiedDate;
+
+  //생성자, 수정자
+  @CreatedBy
+  @Column(updatable = false)
+  private String createBy;
+
+  @LastModifiedBy
+  private String lastModifiedBy;
+
+}
+
+//상속받아서 사용
+public class Member extends BaseEntity {
+  ...
+}
+
+//스프링부트 application에 반드시 annotation 추가
+@EnableJpaAuditing
+@SpringBootApplication
+public class DataJpaApplication {
+  ...
+}
+```
+
+### 💜 페이징과 정렬
+- 파라미터로 받을때
+  - http://localhost:8080/members : 디폴트 페이지 당 size 20개
+  - http://localhost:8080/members `?page=2` : 페이지 당 size 20개
+  - http://localhost:8080/members `?page=1&size=5` : 페이지 당 size 5개
+  - http://localhost:8080/members `?page=1&size=5&sort=id,desc` 정렬조건 추가
+- 별도 page 파라미터 없이 paging 개수 정하고 싶을 떄
+  - application.yml 에서 수정
+  - 각 컨트롤러에서 `@PageableDefault` 추가
+```java
+public Page<Member> list(@PageableDefault(size = 5, sort = "username") Pageable pageable) {
+        ...
+}
+```
+- ⭐entity 를 그대로 내보내지 말고 반드시 dto 로 변환해서 내보내자!⭐
+```java
+@GetMapping("/members")
+public Page<MemberDto> list(@PageableDefault(size = 5) Pageable pageable) {
+    return memberRepository.findAll(pageable).map(MemberDto::new);
+}
+```
+
+### 💜 새로운 엔티티를 구별
+- Entity 를 처음 만들때 @Id, @GeneratedValue 에 의해 id 값이 없음
+  - 이때 식별자를 Primitive type 인 long 이면 0으로 판단
+  - Reference Type 인 Long 으로 쓰면 null 로 판단
+- null 이면 `persist`
+- null 이 아니면 `merge`
+- **`@GeneratedValue` 안쓰면 jpa 가 새로운 객체로 인식하지않으므로 persist X**
+  - `Persistable` 인터페이스를 구현해서 새로운 객체 여부 로직 만들기
+  - 보통 `@CreatedDate` 활용하여 `CreatedDate==null`이면 새로운 객체로 인식
+
+### 💜 Projections
+- Entity 대신 DTO 편리하게 조회할 때 사용
+- 인터페이스 기반 Closed Projections
+```mysql
+select
+    member0_.username as col_0_0_ 
+from
+    member member0_ 
+where
+    member0_.username=?
+```
+- 클래스 기반 Projection
+- 동적 Projections
+```java
+<T> List<T> findProjectionsByUsername(String username, Class<T> type);
+```
+  - 중첩구조 처리
+    - 프로젝션 대상이 ROOT 가 아니면 LEFT OUTER JOIN 처리 => 최적화가 안됨
