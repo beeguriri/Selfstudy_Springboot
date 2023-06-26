@@ -170,3 +170,9 @@ Long count = queryFactory
     - `JPAExpressions` 사용
     - select, where 절에서는 사용가능하나
     - from 절에서는 사용이 불가
+- Case 문
+  - 왠만하면 DB는 raw 데이터 필터링, 그룹핑만 하고
+  - 어플리케이션, 프리젠테이션 레이어에서 해결하기
+```java
+.when(10).then("열살")
+``` 
