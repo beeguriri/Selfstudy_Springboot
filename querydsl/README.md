@@ -176,3 +176,107 @@ Long count = queryFactory
 ```java
 .when(10).then("열살")
 ``` 
+
+### 💜 프로젝션 - DTO 조회
+- 프로퍼티 접근(Setter)
+- 필드 직접 접근
+- 생성자 사용
+  - Projections.constructor : 런타임오류
+  - QueryProjection : 컴파일오류
+    - 생성자에 QueryProjection 붙여주고
+    - querydsl compile 실행
+    - Dto 가 Querydsl 에 의존성을 가짐 
+```java
+    //생성자 방식
+//필드 이름이 달라도 타입만 맞으면 적용 됨
+public void findUserDtoByConstructor() {
+    
+    List<UserDto> result = queryFactory
+           .select(Projections.constructor(UserDto.class,
+                         member.username, member.age))
+            .from(member)
+            .fetch();
+}
+
+// Projections.constructor : 런타임오류
+// QueryProjection : 컴파일오류
+public void findDtoByQueryProjection() {
+
+    List<MemberDto> result = queryFactory
+            .select(new QMemberDto(member.username, member.age))
+            .from(member)
+            .fetch();
+}
+```
+
+### 💜 동적 쿼리
+- BooleanBuilder
+  - builder 에 `.and()` `.or()`로 조립
+  - null 이면 where 절에 조건이 안들어감
+- Where 다중 파라미터
+  - `where` 조건에 `null` 값 무시
+  - 메서드로 다른 쿼리에서 재활용
+```java
+private List<Member> searchMember2(String usernameCond, Integer ageCond) {
+    return queryFactory
+            .selectFrom(member)
+            //응답값이 null 이면 무시됨 => 동적쿼리
+            .where(allEq(usernameCond, ageCond))
+            .fetch();
+}
+
+private BooleanExpression usernameEq(String usernameCond) {
+    return usernameCond!=null ? member.username.eq(usernameCond) : null;
+}
+
+private BooleanExpression ageEq(Integer ageCond) {
+    return ageCond!=null ? member.age.eq(ageCond) : null;
+}
+
+private BooleanExpression allEq(String usernameCond, Integer ageCond) {
+    return usernameEq(usernameCond).and(ageEq(ageCond));
+}
+```
+
+### 💜 벌크 연산
+- 영속성컨텍스트와 DB의 상태가 달라짐
+  - 영속성컨텍스트가 항상 우선권을 가짐
+- 벌크 연산후에는 반드시 영속성컨텍스트 초기화
+```java
+  em.flush();
+  em.clear();
+```
+
+### 💜 SQL Function 호출
+- `H2Dialect` 클래스 내 registerFunction 으로 등록되어있으면 사용할 수 있음
+```java
+//H2Dialect
+registerFunction( "replace", new StandardSQLFunction( "replace", StandardBasicTypes.STRING ) );
+
+//Dialect
+registerFunction( "lower", new StandardSQLFunction("lower") );
+
+//사용
+.select(
+    Expressions.stringTemplate(
+        "function('replace', {0}, {1}, {2})",
+            member.username, "member", "M")
+)
+
+.where(member.username.eq(
+    Expressions.stringTemplate(
+            "function('lower', {0})",
+                member.username)
+))
+```
+> SQL문 확인1  
+select function('replace', member1.username, ?1, ?2)  
+from Member member1
+
+> SQL문 확인2  
+select member1.username    
+from Member member1  
+where  member1.username = function('lower', member1.username)
+
+
+###
