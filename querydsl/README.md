@@ -288,3 +288,8 @@ where  member1.username = function('lower', member1.username)
   - 굳이 customRepository 인터페이스 구현하지말고
   - `MemberQueryRepository` - `@Repository` 별도의 조회 repository 사용
   - 아키텍쳐 적으로 유연하게...!
+
+### 💜 DataJPA와 QueryDsl 사용 : 페이징
+- `fetchResults()`, `fetchCount()` Deprecated
+- count 쿼리 별도 생성 해줘야함
+- 
