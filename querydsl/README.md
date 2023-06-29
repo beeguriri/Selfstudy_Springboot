@@ -279,4 +279,17 @@ from Member member1
 where  member1.username = function('lower', member1.username)
 
 
-###
+### 💜 DataJPA와 QueryDsl 사용
+- 방법1
+  - `MemberRepositoryCustom` 인터페이스 만들고
+  - `MemberRepositoryImpl`클래스에 해당 메서드 구현 (클래스이름 주의)
+  - `MemberRepository`에서 커스텀 인터페이스 상속받기
+- 방법2 : 특정 API 에 특화된 조회의 경우
+  - 굳이 customRepository 인터페이스 구현하지말고
+  - `MemberQueryRepository` - `@Repository` 별도의 조회 repository 사용
+  - 아키텍쳐 적으로 유연하게...!
+
+### 💜 DataJPA와 QueryDsl 사용 : 페이징
+- `fetchResults()`, `fetchCount()` Deprecated
+- count 쿼리 별도 생성 해줘야함
+- 
