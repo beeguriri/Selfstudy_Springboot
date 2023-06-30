@@ -5,7 +5,6 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.util.StringUtils;
@@ -19,12 +18,19 @@ import static study.querydsl.entity.QMember.member;
 import static study.querydsl.entity.QTeam.team;
 
 @RequiredArgsConstructor
+//public class MemberRepositoryImpl extends QuerydslRepositorySupport implements MemberRepositoryCustom {
 public class MemberRepositoryImpl implements MemberRepositoryCustom {
 
-    private final JPAQueryFactory queryFactory;
+        private final JPAQueryFactory queryFactory;
+
+    //EntityManager 주입해줌
+//    public MemberRepositoryImpl() {
+//        super(Member.class);
+//    }
 
     @Override
     public List<MemberTeamDto> search(MemberSearchCondition condition) {
+
         return queryFactory
                 .select(new QMemberTeamDto(
                         member.id.as("memberId"),
