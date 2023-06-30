@@ -292,4 +292,81 @@ where  member1.username = function('lower', member1.username)
 ### 💜 DataJPA와 QueryDsl 사용 : 페이징
 - `fetchResults()`, `fetchCount()` Deprecated
 - count 쿼리 별도 생성 해줘야함
-- 
+```java
+ public Page<MemberTeamDto> searchPage(MemberSearchCondition condition, Pageable pageable) {
+    ...
+
+    JPAQuery<Long> countQuery = queryFactory
+            .select(member.count())
+            .from(member)
+            .leftJoin(member.team, team)
+            .where(
+                    usernameEq(condition.getUsername()),
+                    teamNameEq(condition.getTeamName()),
+                    ageGoe(condition.getAgeGoe()),
+                    ageLoe(condition.getAgeLoe())
+            );
+    
+    return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+}
+```
+- localhost:8080/v2/members?page=0&size=5
+```h2
+select
+    member1.id as memberId,
+    member1.username,
+    member1.age,
+    team.id as teamId,
+    team.name as teamName 
+from
+    Member member1   
+left join
+    member1.team as team    
+```
+```h2
+select
+    count(member1) 
+from
+    Member member1   
+left join
+    member1.team as team
+```
+```json
+{
+    "content": [
+        {
+            "memberId": 1,
+            "username": "member0",
+            "age": 0,
+            "teamId": 1,
+            "teamName": "teamA"
+        },
+        ...
+    ],
+    "pageable": {
+        "sort": {
+            "empty": true,
+            "sorted": false,
+            "unsorted": true
+        },
+        "offset": 0,
+        "pageNumber": 0,
+        "pageSize": 5,
+        "unpaged": false,
+        "paged": true
+    },
+    "last": false,
+    "totalElements": 100,
+    "totalPages": 20,
+    "size": 5,
+    "number": 0,
+    "sort": {
+        "empty": true,
+        "sorted": false,
+        "unsorted": true
+    },
+    "first": true,
+    "numberOfElements": 5,
+    "empty": false
+}
+```
