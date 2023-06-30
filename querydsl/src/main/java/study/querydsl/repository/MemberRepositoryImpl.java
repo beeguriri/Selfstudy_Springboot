@@ -45,7 +45,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
     }
 
     @Override
-    public Page<MemberTeamDto> searchPageSimple(MemberSearchCondition condition, Pageable pageable) {
+    public Page<MemberTeamDto> searchPage(MemberSearchCondition condition, Pageable pageable) {
 
         List<MemberTeamDto> content = queryFactory
                 .select(new QMemberTeamDto(
@@ -78,13 +78,9 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
                         ageLoe(condition.getAgeLoe())
                 );
 
-        return new PageImpl<>(content, pageable, countQuery.fetchOne());
-//        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
-    }
-
-    @Override
-    public Page<MemberTeamDto> searchPageComplex(MemberSearchCondition condition, Pageable pageable) {
-        return null;
+//        return new PageImpl<>(content, pageable, countQuery.fetchOne());
+//        return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetchOne());
+        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
 
     private BooleanExpression usernameEq(String username) {
