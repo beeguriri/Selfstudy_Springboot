@@ -31,3 +31,8 @@
 #### [`8. querydsl`](https://github.com/beeguriri/Selfstudy_Springboot/tree/main/querydsl)
 - 실전! Querydsl
 - 스프링 데이터 JPA와 Querydsl
+
+#### [`9. advanced`](https://github.com/beeguriri/Selfstudy_Springboot/tree/main/advanced)
+- 스프링 핵심 원리 - 고급편
+- 스프링 핵심 디자인 패턴, 동시성 문제를 다루기 위한 쓰레드 로컬, 스프링 AOP
+
