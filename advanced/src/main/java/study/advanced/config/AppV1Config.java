@@ -1,4 +1,4 @@
-package study.advanced.proxy.config;
+package study.advanced.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
