@@ -4,8 +4,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;
 import study.advanced.config.AppV1Config;
+import study.advanced.config.AppV2Config;
 
-@Import(AppV1Config.class)
+@Import({AppV1Config.class, AppV2Config.class})
 @SpringBootApplication(scanBasePackages = "study.advanced.proxy")
 public class AdvancedApplication {
 
