@@ -4,12 +4,13 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import study.advanced.config.v1_proxy.InterfaceProxyConfig;
+import study.advanced.config.v1_proxy.ConcreteProxyConfig;
 import study.advanced.trace.logtrace.LogTrace;
 import study.advanced.trace.logtrace.ThreadLocalLogTrace;
 
 //@Import({AppV1Config.class, AppV2Config.class})
-@Import(InterfaceProxyConfig.class)
+//@Import(InterfaceProxyConfig.class)
+@Import(ConcreteProxyConfig.class)
 @SpringBootApplication(scanBasePackages = "study.advanced.proxy")
 public class AdvancedApplication {
 
