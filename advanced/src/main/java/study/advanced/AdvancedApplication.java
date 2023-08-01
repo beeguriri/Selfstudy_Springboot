@@ -4,7 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import study.advanced.config.v4_postprocessor.BeanPostProcessorConfig;
+import study.advanced.config.v5_autoproxy.AutoProxyConfig;
 import study.advanced.trace.logtrace.LogTrace;
 import study.advanced.trace.logtrace.ThreadLocalLogTrace;
 
@@ -15,7 +15,8 @@ import study.advanced.trace.logtrace.ThreadLocalLogTrace;
 //@Import(DynamicProxyFilterConfig.class)
 //@Import(ProxyFactoryConfigV1.class)
 //@Import(ProxyFactoryConfigV2.class)
-@Import(BeanPostProcessorConfig.class)
+//@Import(BeanPostProcessorConfig.class)
+@Import(AutoProxyConfig.class)
 @SpringBootApplication(scanBasePackages = "study.advanced.proxy")
 public class AdvancedApplication {
 
