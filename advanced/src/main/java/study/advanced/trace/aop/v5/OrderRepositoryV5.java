@@ -1,4 +1,4 @@
-package study.advanced.aop.v5;
+package study.advanced.trace.aop.v5;
 
 import org.springframework.stereotype.Repository;
 import study.advanced.trace.callback.TraceTemplate;

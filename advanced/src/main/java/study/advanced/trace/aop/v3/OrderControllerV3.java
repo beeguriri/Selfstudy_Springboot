@@ -1,19 +1,19 @@
-package study.advanced.aop.v1;
+package study.advanced.trace.aop.v3;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import study.advanced.trace.TraceStatus;
-import study.advanced.trace.hellotrace.HelloTraceV1;
+import study.advanced.trace.logtrace.LogTrace;
 
 @RestController
 @RequiredArgsConstructor
-public class OrderControllerV1 {
+public class OrderControllerV3 {
 
-    private final OrderServiceV1 orderService;
-    private final HelloTraceV1 trace;
+    private final OrderServiceV3 orderService;
+    private final LogTrace trace;
 
-    @GetMapping("/v1/request")
+    @GetMapping("/v3/request")
     public String request(String itemId) {
 
         TraceStatus status = null;
@@ -27,8 +27,6 @@ public class OrderControllerV1 {
 
         } catch (Exception e) {
             trace.exception(status, e);
-            // 예외를 꼭 다시 던져주어야 함.
-            // 애플리케이션 흐름에 변경X
             throw e;
         }
 

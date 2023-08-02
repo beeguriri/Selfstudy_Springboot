@@ -19,6 +19,7 @@ import study.advanced.trace.logtrace.ThreadLocalLogTrace;
 //@Import(AutoProxyConfig.class)
 @Import(AopConfig.class)
 @SpringBootApplication(scanBasePackages = "study.advanced.proxy")
+//@SpringBootApplication(scanBasePackages = "study.advanced.trace")
 public class AdvancedApplication {
 
 	public static void main(String[] args) {

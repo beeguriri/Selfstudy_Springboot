@@ -1,4 +1,4 @@
-package study.advanced.aop.v0;
+package study.advanced.trace.aop.v0;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;

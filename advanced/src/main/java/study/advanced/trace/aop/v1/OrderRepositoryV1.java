@@ -1,15 +1,15 @@
-package study.advanced.aop.v3;
+package study.advanced.trace.aop.v1;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import study.advanced.trace.TraceStatus;
-import study.advanced.trace.logtrace.LogTrace;
+import study.advanced.trace.hellotrace.HelloTraceV1;
 
 @Repository
 @RequiredArgsConstructor
-public class OrderRepositoryV3 {
+public class OrderRepositoryV1 {
 
-    private final LogTrace trace;
+    private final HelloTraceV1 trace;
 
     public void save(String itemId){
 

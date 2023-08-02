@@ -1,24 +1,23 @@
-package study.advanced.aop.v2;
+package study.advanced.trace.aop.v3;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import study.advanced.trace.TraceId;
 import study.advanced.trace.TraceStatus;
-import study.advanced.trace.hellotrace.HelloTraceV2;
+import study.advanced.trace.logtrace.LogTrace;
 
 @Repository
 @RequiredArgsConstructor
-public class OrderRepositoryV2 {
+public class OrderRepositoryV3 {
 
-    private final HelloTraceV2 trace;
+    private final LogTrace trace;
 
-    public void save(TraceId traceId, String itemId){
+    public void save(String itemId){
 
         TraceStatus status = null;
 
         //예외가 발생해도 log 출력
         try {
-            status = trace.beginSync(traceId, "OrderRepository.save()");
+            status = trace.begin("OrderRepository.save()");
 
             if(itemId.equals("ex"))
                 throw new IllegalStateException("예외 발생");

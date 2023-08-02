@@ -1,4 +1,4 @@
-package study.advanced.aop.v3;
+package study.advanced.trace.aop.v3;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
