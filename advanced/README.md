@@ -5,6 +5,9 @@
   - [템플릿 콜백 패턴](#로그추적기-v5-템플릿-콜백-패턴-전략패턴위임--파라미터-방식)
 - [프록시](#-프록시패턴과-데코레이터-패턴)
   - [AutoProxyCreator](#참고-자동-프록시-생성기)
+- [AOP](#-aop)
+  - [어노테이션 기반 AOP 적용](#어노테이션-기반-aop-적용하기)
+  - [AOP 관련 용어](#관련-용어)
 
 ## 프로젝트 생성 및 세팅
 - 'https://start.spring.io/' 에서 프로젝트 생성
@@ -284,3 +287,117 @@ public class LogTraceAspect {
     }
 }
 ```
+### 💜 AOP
+#### AOP: 관점 지향 프로그램
+- 핵심기능과 부가 기능을 분리
+- `Aspect` 횡단 관심사를 원하는 곳에 부가 기능 적용
+- AOP의 대표적인 구현으로 `AspectJ` 프레임워크 사용
+- AOP 적용방식
+  - 컴파일 시점: AspectJ를 직접 사용
+  - 클래스 로딩 시점: AspectJ를 직접 사용
+  - **런타임 시점 (프록시)**: 메서드에만 적용할 수 있다는 제약이 있음
+- AOP 적용위치
+  - 적용 가능 지점: 조인 포인트 
+  - 컴파일, 클래스 로딩 시점 적용 시 생성자, 필드값 등에도 적용 가능
+  - `프록시`를 사용하는 스프링AOP는 `메서드 실행지점`으로 제한, `스프링 빈`에만 AOP 적용 가능
+
+##### 🎈관련 용어
+- 조인포인트(Join point)
+  - AOP를 적용할 수 있는 모든 지점
+  - `스프링AOP`는 프록시 방식을 사용하므로 항상 `메서드 실행 지점`으로 제한
+- 포인트컷(Pointcut)
+  - 어드바이스가 적용 될 위치를 선별하는 기능
+  - 주로 AspectJ 표현식을 사용해서 지정
+- 타켓(target)
+  - 어드바이스를 받는 객체
+- 어드바이스(advice)
+  - 부가기능
+  - 종류: `Around`, `Before`, `After`
+- 에스펙스(Aspect): `@Aspect`
+  - 어드바이스 + 포인트 컷을 모듈화 
+  - 여러 어드바이스와 포인트 컷이 함께 존재
+- 어드바이저(Advisor)
+  - 하나의 어드바이스와 포인트컷으로 구성
+
+#### 스프링 AOP 구현
+- `@Aspect`는 컴포넌트 스캔의 대상이 아니므로 반드시 빈으로 등록 해 줄것
+- `@Pointcut` 어노테이션을 이용하여 포인트컷 여러개 지정 할 수 있음
+- `@Order(순서)` 어노테이션을 이용하여 어드바이스 순서 지정 할 수 있음
+  - 순서는 `@Aspect` 단위로 적용할 수 있으므로 어드바이스 별로 클래스를 만들어야함
+- `@Around` 사용 할 때, 반드시 `joinPoint.proceed()` 로 타겟 실행해주어야함
+```java
+@Aspect
+public class AspectV3 {
+
+    //포인터컷 분리하면 여러 어드바이스에서 함께 사용할 수 있음.
+    @Pointcut("execution(* study.advanced.aop.order..*(..))")
+    private void allOrder() {} //pointcut signature
+
+    //클래스 이름 패턴이 *Service 인것
+    @Pointcut("execution(* *..*Service.*(..))")
+    private void allService() {}
+
+    @Around("allOrder()")
+    public Object doLog(ProceedingJoinPoint joinPoint) throws Throwable{
+      //어드바이스
+      return joinPoint.proceed();
+    }
+
+    //..order 패키지와 하위 패키지 이면서 클래스 이름 패턴이 *Service
+    @Around("allOrder() && allService()")
+    public Object doTransaction(ProceedingJoinPoint joinPoint) throws Throwable {
+      //어드바이스
+      return joinPoint.proceed();
+    }
+}
+```
+
+#### 어드바이스 종류
+- `@Around`: joinPoint 반드시 개발자가 실행
+- `@Before`: try구문 before 실행 후 joinPoint 자동 실행
+- `@AfterReturning`: try구문 joinPoint 실행 후 결과값 가짐
+- `@AfterThrowing` : catch 구문 예외값 가짐
+- `@After` : finally 구문
+
+#### 포인트컷 지시자: `execution`
+> execution({접근제어자} 반환타입 {선언타입}.메서드명(파라미터) {예외})  
+> execution(public String study.advanced.aop.member.MemberServiceImpl.hello(String))  
+- {}: 생략가능
+- `*` 같은 패턴 지정 할 수 있음
+- `.`: 해당 위치의 패키지, `..`: 해당 위치의 패키지와 하위 패키지 포함
+- 그 외 지시자는 `test>aop>pointcut` 참고
+
+#### 어노테이션 기반 AOP 적용하기
+- 사용자 정의 어노테이션 만들기 (예제: `@Trace`, `@Retry`)
+```java
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Retry {
+    int value() default 3; //default 값 줄 수 있음
+}
+```
+- 비즈니스 로직 중 aop 적용하고자 하는 메서드에 어노테이션 붙이기
+```java
+public class ExamRepository {
+  ...
+    @Trace
+    @Retry(value = 4) //default값 필요에따라 변경 가능
+    public String save(String itemId) {
+      ...
+    }
+}
+```
+- `Aspect` 클래스 만들어주기
+```java
+@Aspect
+public class RetryAspect {
+    //어노테이션 이름으로 패키지 이름 등등 쓰지않고 간결하게 표현 가능
+    @Around("@annotation(retry)")
+    public Object doRetry(ProceedingJoinPoint joinPoint, Retry retry) throws Throwable {
+        log.info("[retry] {} retry={}", joinPoint.getSignature(), retry);
+        int maxRetry = retry.value(); //어노테이션의 값 꺼내올 수 있음
+        ...
+    }
+}
+```
+- `Aspect`를 `@Bean` 등으로 등록하고 사용함
